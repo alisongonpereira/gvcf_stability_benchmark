@@ -56,30 +56,31 @@ check_prerequisites() {
 # ─── Per-size runner ──────────────────────────────────────────────────────────
 run_size() {
     local size="$1"
+    local rep="$2"
 
-    local dataset_dir="${BENCHMARK_DIR}/01_prep/dataset_${size}"
+    local dataset_dir="${BENCHMARK_DIR}/01_prep/dataset_${size}_rep${rep}"
     local manifest="${dataset_dir}/manifest.txt"
-    local output_dir="${BENCHMARK_DIR}/02_execution/${SOFTWARE}/dataset_${size}"
+    local output_dir="${BENCHMARK_DIR}/02_execution/${SOFTWARE}/dataset_${size}_rep${rep}"
     local output_vcf="${output_dir}/output.vcf"
     local stderr_log="${output_dir}/stderr.log"
     local monitor_json="${output_dir}/monitor.json"
-    local metrics_json="${BENCHMARK_DIR}/03_metrics/metrics_${SOFTWARE}_${size}.json"
+    local metrics_json="${BENCHMARK_DIR}/03_metrics/metrics_${SOFTWARE}_${size}_rep${rep}.json"
 
     mkdir -p "${output_dir}"
 
     if is_done "${output_dir}"; then
-        log "PARABRICKS" "[dataset_${size}] Already completed — skipping"
+        log "PARABRICKS" "[dataset_${size}_rep${rep}] Already completed — skipping"
         return 0
     fi
 
     if [[ ! -f "${manifest}" ]]; then
-        warn "PARABRICKS" "[dataset_${size}] manifest.txt not found — run preparation first"
+        warn "PARABRICKS" "[dataset_${size}_rep${rep}] manifest.txt not found — run preparation first"
         return 1
     fi
 
     local gvcf_count
     gvcf_count=$(wc -l < "${manifest}")
-    log "PARABRICKS" "[dataset_${size}] Starting — ${gvcf_count} GVCFs"
+    log "PARABRICKS" "[dataset_${size}_rep${rep}] Starting — ${gvcf_count} GVCFs"
 
     # Build --in-gvcf arguments
     local ingvcf_args=()
@@ -101,7 +102,7 @@ run_size() {
     local start_iso;   start_iso=$(date -u +%Y-%m-%dT%H:%M:%S)
     local exit_code=0
 
-    log "PARABRICKS" "[dataset_${size}] Executing pbrun joint_genotyping..."
+    log "PARABRICKS" "[dataset_${size}_rep${rep}] Executing pbrun genotypegvcf..."
     # "${PARABRICKS_BIN}" joint_genotyping \
     #     --ref     "${REF_GENOME}" \
     #     "${ingvcf_args[@]}" \
@@ -135,14 +136,14 @@ run_size() {
 
     if [[ "${exit_code}" -ne 0 ]]; then
         status="failed"
-        warn "PARABRICKS" "[dataset_${size}] exit_code=${exit_code} — see ${stderr_log}"
+        warn "PARABRICKS" "[dataset_${size}_rep${rep}] exit_code=${exit_code} — see ${stderr_log}"
     else
         if validate_vcf "${output_vcf}"; then
             output_valid="true"
             variant_count=${VARIANT_COUNT}
         else
             status="invalid_output"
-            warn "PARABRICKS" "[dataset_${size}] Output VCF validation failed"
+            warn "PARABRICKS" "[dataset_${size}_rep${rep}] Output VCF validation failed"
         fi
     fi
 
@@ -152,7 +153,7 @@ run_size() {
         "${output_vcf}"   "${output_valid}" "${variant_count}" \
         "${monitor_json}"
 
-    log "PARABRICKS" "[dataset_${size}] Done — status=${status} wall_time=${wall_time}s variants=${variant_count}"
+    log "PARABRICKS" "[dataset_${size}_rep${rep}] Done — status=${status} wall_time=${wall_time}s variants=${variant_count}"
 
     if [[ "${status}" == "success" ]]; then
         mark_done "${output_dir}"
@@ -162,14 +163,17 @@ run_size() {
 # ─── Main ─────────────────────────────────────────────────────────────────────
 main() {
     log "PARABRICKS" "============================================================"
-    log "PARABRICKS" "Parabricks Benchmark — sizes: ${DATASET_SIZES[*]}"
+    log "PARABRICKS" "Parabricks Benchmark — sizes: ${DATASET_SIZES[*]}  replicates: ${BENCHMARK_REPLICATES}"
     log "PARABRICKS" "============================================================"
 
     check_prerequisites
 
     local any_failed=0
     for size in "${DATASET_SIZES[@]}"; do
-        run_size "${size}" || { warn "PARABRICKS" "dataset_${size} failed (continuing)"; any_failed=1; }
+        for rep in $(seq 1 "${BENCHMARK_REPLICATES}"); do
+            run_size "${size}" "${rep}" \
+                || { warn "PARABRICKS" "dataset_${size}_rep${rep} failed (continuing)"; any_failed=1; }
+        done
     done
 
     log "PARABRICKS" "Parabricks benchmark complete."

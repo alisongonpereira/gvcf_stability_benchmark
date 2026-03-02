@@ -4,13 +4,16 @@ Step 1 — Dataset Preparation
 
 Randomly selects GVCFs from the input pool and creates per-size dataset
 directories with symlinks and a manifest (manifest.txt).  Reproducible via
---seed.  Skips sizes that are already prepared unless --force is given.
+--seed.  With --replicates N, creates N independent random draws per size,
+each in dataset_{size}_rep{r}/.  Skips already-prepared datasets unless
+--force is given.
 
 Usage:
     python3 01_prepare_datasets.py \
         --input-dir   /path/to/input_gvcfs \
         --output-dir  /path/to/benchmarks/01_prep \
-        --sizes 10 20 30 40 50 60 70 80 90 100 \
+        --sizes 10 25 50 75 100 \
+        --replicates 3 \
         --seed 42 \
         --log  /path/to/preparation.log
 """
@@ -72,26 +75,28 @@ def prepare_dataset(
     rng: random.Random,
     logger: logging.Logger,
     force: bool = False,
+    replicate: int = 1,
 ) -> dict:
     """
-    Create dataset_<size>/ with symlinks and manifest.txt.
+    Create dataset_<size>_rep<replicate>/ with symlinks and manifest.txt.
     Returns a dict describing the dataset.
     """
-    dataset_dir = output_dir / f"dataset_{size}"
+    tag         = f"dataset_{size}_rep{replicate}"
+    dataset_dir = output_dir / tag
     done_flag   = dataset_dir / ".done"
 
     if done_flag.exists() and not force:
-        logger.info(f"dataset_{size}: already prepared — skipping (use --force to redo)")
+        logger.info(f"{tag}: already prepared — skipping (use --force to redo)")
         # Re-read manifest
         manifest = dataset_dir / "manifest.txt"
         selected = manifest.read_text().splitlines() if manifest.exists() else []
-        return {"size": size, "status": "skipped", "files": selected}
+        return {"size": size, "replicate": replicate, "status": "skipped", "files": selected}
 
     if size > len(pool):
         logger.warning(
-            f"dataset_{size}: requested {size} GVCFs but pool only has {len(pool)} — skipping"
+            f"{tag}: requested {size} GVCFs but pool only has {len(pool)} — skipping"
         )
-        return {"size": size, "status": "insufficient_pool", "files": []}
+        return {"size": size, "replicate": replicate, "status": "insufficient_pool", "files": []}
 
     dataset_dir.mkdir(parents=True, exist_ok=True)
 
@@ -124,6 +129,7 @@ def prepare_dataset(
     # Write JSON metadata
     meta = {
         "dataset_size": size,
+        "replicate": replicate,
         "created_at": datetime.now().isoformat(),
         "manifest": symlink_paths,
         "source_files": [str(p) for p in selected_sorted],
@@ -135,11 +141,11 @@ def prepare_dataset(
     # Mark done
     done_flag.write_text(datetime.now().isoformat() + "\n")
 
-    logger.info(f"dataset_{size}: created {size} symlinks in {symlink_dir}")
+    logger.info(f"{tag}: created {size} symlinks in {symlink_dir}")
     for p in selected_sorted:
         logger.info(f"  → {p.name}")
 
-    return {"size": size, "status": "created", "files": symlink_paths}
+    return {"size": size, "replicate": replicate, "status": "created", "files": symlink_paths}
 
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
@@ -149,8 +155,10 @@ def main():
     parser.add_argument("--input-dir",  required=True, help="Directory with GVCF pool")
     parser.add_argument("--output-dir", required=True, help="benchmarks/01_prep directory")
     parser.add_argument("--sizes", type=int, nargs="+", required=True,
-                        help="Dataset sizes, e.g. 10 20 30 ... 100")
-    parser.add_argument("--seed",  type=int, default=42, help="Random seed")
+                        help="Dataset sizes, e.g. 10 25 50 75 100")
+    parser.add_argument("--replicates", type=int, default=1,
+                        help="Number of independent replicates per size (default 1)")
+    parser.add_argument("--seed",  type=int, default=42, help="Base random seed")
     parser.add_argument("--log",   default="preparation.log", help="Log file path")
     parser.add_argument("--force", action="store_true",
                         help="Recreate datasets even if already done")
@@ -162,7 +170,8 @@ def main():
     logger.info(f"Input directory : {args.input_dir}")
     logger.info(f"Output directory: {args.output_dir}")
     logger.info(f"Dataset sizes   : {args.sizes}")
-    logger.info(f"Random seed     : {args.seed}")
+    logger.info(f"Replicates      : {args.replicates}")
+    logger.info(f"Base seed       : {args.seed}  (rep r → seed + r - 1)")
     logger.info("=" * 60)
 
     input_dir  = Path(args.input_dir)
@@ -186,17 +195,23 @@ def main():
     pool_list.write_text("\n".join(str(p) for p in pool) + "\n")
     logger.info(f"Pool list written to {pool_list}")
 
-    rng = random.Random(args.seed)
-
     results = []
-    for size in sorted(args.sizes):
-        result = prepare_dataset(size, pool, output_dir, rng, logger, args.force)
-        results.append(result)
+    for rep in range(1, args.replicates + 1):
+        # Each replicate gets its own RNG seeded at base_seed + rep - 1
+        rep_seed = args.seed + rep - 1
+        rng = random.Random(rep_seed)
+        logger.info(f"--- Replicate {rep}/{args.replicates} (seed={rep_seed}) ---")
+        for size in sorted(args.sizes):
+            result = prepare_dataset(
+                size, pool, output_dir, rng, logger, args.force, replicate=rep
+            )
+            results.append(result)
 
     # Summary
     logger.info("-" * 60)
     for r in results:
-        logger.info(f"  dataset_{r['size']:>3}: {r['status']} ({len(r['files'])} files)")
+        tag = f"dataset_{r['size']}_rep{r['replicate']}"
+        logger.info(f"  {tag:>20}: {r['status']} ({len(r['files'])} files)")
 
     created = sum(1 for r in results if r["status"] == "created")
     skipped = sum(1 for r in results if r["status"] == "skipped")

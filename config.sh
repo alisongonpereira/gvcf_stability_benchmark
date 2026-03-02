@@ -60,13 +60,15 @@ GENOMICSDB_BATCH_SIZE="${GENOMICSDB_BATCH_SIZE:-50}"
 
 # ─── Benchmark Control ────────────────────────────────────────────────────────
 # Sizes (number of GVCFs per dataset run)
-DATASET_SIZES=(10 20 30 40 50 60 70 80 90 100)
-# Reproducible random selection seed
+DATASET_SIZES=(10 25 50 75 100)
+# Independent replicates per dataset size (different random sample per rep)
+BENCHMARK_REPLICATES="${BENCHMARK_REPLICATES:-3}"
+# Reproducible random selection seed (rep N uses seed + N - 1)
 RANDOM_SEED="${RANDOM_SEED:-42}"
 # Resource-monitor sampling interval (seconds)
 MONITOR_INTERVAL="${MONITOR_INTERVAL:-5}"
-# Which softwares to benchmark — comment out any to skip
-BENCHMARK_SOFTWARES=("glnexus" "parabricks" "gatk" "gatk_genomicsdb")
+# Run order: Parabricks (GPU, fastest) → GLnexus → GATK GenomicsDB → GATK CombineGVCFs (slowest)
+BENCHMARK_SOFTWARES=("parabricks" "glnexus" "gatk_genomicsdb" "gatk")
 
 # ─── Paths (derived; normally no need to change) ──────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

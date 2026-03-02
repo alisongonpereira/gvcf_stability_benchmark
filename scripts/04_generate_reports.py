@@ -40,6 +40,14 @@ def _mean(vals):
     return sum(vals) / len(vals) if vals else 0.0
 
 
+def _std(vals):
+    """Sample standard deviation (n-1). Returns 0 for <2 values."""
+    if len(vals) < 2:
+        return 0.0
+    m = _mean(vals)
+    return math.sqrt(sum((v - m) ** 2 for v in vals) / (len(vals) - 1))
+
+
 def _linreg(x, y):
     """Return (slope, intercept) for simple linear regression."""
     n = len(x)
@@ -126,18 +134,27 @@ METRICS = {
 
 def load_all_metrics(metrics_dir: Path) -> dict:
     """
-    Returns dict[software][size] = metrics_dict, merging top-level
-    wall_time_s with the nested resources dict.
+    Returns dict[software][size] = list[metrics_dict], one entry per replicate.
+    Handles both new format (metrics_sw_size_rep{r}.json) and legacy format
+    (metrics_sw_size.json, treated as rep 1 for backward compatibility).
     """
-    data: dict[str, dict[int, dict]] = {s: {} for s in SOFTWARES}
+    data: dict[str, dict[int, list]] = {s: {} for s in SOFTWARES}
 
     for path in sorted(metrics_dir.glob("metrics_*.json")):
-        m = re.match(r"metrics_(\w+)_(\d+)\.json", path.name)
-        if not m:
-            continue
-        software, size = m.group(1), int(m.group(2))
+        # New format: metrics_sw_size_rep{r}.json
+        m = re.match(r"metrics_(\w+)_(\d+)_rep(\d+)\.json", path.name)
+        if m:
+            software, size, rep = m.group(1), int(m.group(2)), int(m.group(3))
+        else:
+            # Legacy format: metrics_sw_size.json → rep 1
+            m = re.match(r"metrics_(\w+)_(\d+)\.json", path.name)
+            if not m:
+                continue
+            software, size, rep = m.group(1), int(m.group(2)), 1
+
         if software not in data:
             data[software] = {}
+
         try:
             with open(path) as f:
                 rec = json.load(f)
@@ -149,6 +166,7 @@ def load_all_metrics(metrics_dir: Path) -> dict:
         flat = {
             "software":      rec.get("software", software),
             "dataset_size":  rec.get("dataset_size", size),
+            "replicate":     rep,
             "status":        rec.get("status", "unknown"),
             "exit_code":     rec.get("exit_code", -1),
             "output_valid":  rec.get("output_valid", False),
@@ -160,7 +178,12 @@ def load_all_metrics(metrics_dir: Path) -> dict:
         for k, v in rec.get("resources", {}).items():
             flat[k] = v
 
-        data[software][size] = flat
+        data[software].setdefault(size, []).append(flat)
+
+    # Sort replicates by replicate number for consistent ordering
+    for sw in data:
+        for size in data[sw]:
+            data[sw][size].sort(key=lambda r: r.get("replicate", 1))
 
     return data
 
@@ -177,49 +200,60 @@ def load_variant_data(metrics_dir: Path) -> tuple[dict, dict]:
     overlap:  dict[int, dict]            = {}
 
     for path in sorted(metrics_dir.glob("variant_analysis_*.json")):
-        m = re.match(r"variant_analysis_(\w+)_(\d+)\.json", path.name)
+        # New format: variant_analysis_sw_size_rep{r}.json
+        m = re.match(r"variant_analysis_(\w+)_(\d+)_rep(\d+)\.json", path.name)
         if not m:
-            continue
+            # Legacy format
+            m = re.match(r"variant_analysis_(\w+)_(\d+)\.json", path.name)
+            if not m:
+                continue
         sw, size = m.group(1), int(m.group(2))
         try:
             with open(path) as f:
-                analysis.setdefault(sw, {})[size] = json.load(f)
+                # Use rep1 (first encountered) for GQ display; skip later reps
+                analysis.setdefault(sw, {}).setdefault(size, json.load(f))
         except Exception as e:
             print(f"[WARN] Could not read {path}: {e}")
 
     for path in sorted(metrics_dir.glob("variant_overlap_*.json")):
-        m = re.match(r"variant_overlap_(\d+)\.json", path.name)
+        # New format: variant_overlap_size_rep{r}.json (use rep1)
+        m = re.match(r"variant_overlap_(\d+)_rep(\d+)\.json", path.name)
         if not m:
-            continue
+            m = re.match(r"variant_overlap_(\d+)\.json", path.name)
+            if not m:
+                continue
         size = int(m.group(1))
         try:
             with open(path) as f:
-                overlap[size] = json.load(f)
+                overlap.setdefault(size, json.load(f))
         except Exception as e:
             print(f"[WARN] Could not read {path}: {e}")
 
     return analysis, overlap
 
 
-def build_series(data: dict, metric: str) -> dict[str, tuple[list, list]]:
+def build_series(data: dict, metric: str) -> dict[str, tuple[list, list, list]]:
     """
-    Returns {software: (x_vals, y_vals)} for the given metric,
-    sorted by dataset size, only for successful runs.
+    Returns {software: (x_vals, y_means, y_stds)} for the given metric.
+    y_means / y_stds are computed across all successful replicates per size.
     """
-    series: dict[str, tuple[list, list]] = {}
+    series: dict[str, tuple[list, list, list]] = {}
     for sw, size_dict in data.items():
-        xs, ys = [], []
+        xs, y_means, y_stds = [], [], []
         for size in sorted(size_dict):
-            rec = size_dict[size]
-            if rec.get("status") != "success":
-                continue
-            val = rec.get(metric)
-            if val is None or not isinstance(val, (int, float)):
+            reps = size_dict[size]  # list of replicate dicts
+            vals = [
+                r.get(metric) for r in reps
+                if r.get("status") == "success"
+                and isinstance(r.get(metric), (int, float))
+            ]
+            if not vals:
                 continue
             xs.append(size)
-            ys.append(val)
+            y_means.append(_mean(vals))
+            y_stds.append(_std(vals))
         if xs:
-            series[sw] = (xs, ys)
+            series[sw] = (xs, y_means, y_stds)
     return series
 
 
@@ -573,16 +607,36 @@ _CHART_LAYOUT_BASE = {
 }
 
 
-def _js_trace(sw: str, xs: list, ys: list, metric_label: str) -> str:
-    return json.dumps({
+def _js_trace(sw: str, xs: list, ys: list, metric_label: str,
+              y_errs: list | None = None, name: str | None = None,
+              dash: str | None = None, alpha: float = 1.0,
+              show_legend: bool = True) -> str:
+    """Build a Plotly JSON trace dict (serialized as a string)."""
+    color = SOFT_COLOR.get(sw, "#888")
+    label = name if name is not None else SOFT_LABEL.get(sw, sw)
+    d: dict = {
         "x": xs,
         "y": [round(v, 3) for v in ys],
-        "name": SOFT_LABEL.get(sw, sw),
+        "name": label,
         "mode": "lines+markers",
-        "line": {"color": SOFT_COLOR.get(sw, "#888"), "width": 2},
-        "marker": {"size": 7},
-        "hovertemplate": f"{SOFT_LABEL.get(sw, sw)}: %{{y:.2f}}<extra></extra>",
-    })
+        "line": {"color": color, "width": 2 if alpha >= 0.8 else 1},
+        "marker": {"size": 6 if alpha >= 0.8 else 4, "opacity": alpha},
+        "opacity": alpha,
+        "showlegend": show_legend,
+        "hovertemplate": f"{label}: %{{y:.2f}}<extra></extra>",
+    }
+    if dash:
+        d["line"]["dash"] = dash
+    if y_errs and any(e > 0 for e in y_errs):
+        d["error_y"] = {
+            "type": "data",
+            "array": [round(e, 3) for e in y_errs],
+            "visible": True,
+            "color": color,
+            "thickness": 1.5,
+            "width": 4,
+        }
+    return json.dumps(d)
 
 
 def _make_chart_js(div_id: str, traces: list[str], title: str, y_title: str) -> str:
@@ -620,7 +674,10 @@ def build_comparison_tab(data: dict) -> tuple[str, str]:
             chart_idx += 1
             html_parts.append(f'<div class="card"><div id="{div_id}" style="height:280px"></div></div>')
             series = build_series(data, metric)
-            traces = [_js_trace(sw, xs, ys, label) for sw, (xs, ys) in series.items()]
+            traces = [
+                _js_trace(sw, xs, ys, label, y_errs=es)
+                for sw, (xs, ys, es) in series.items()
+            ]
             if traces:
                 js_parts.append(_make_chart_js(div_id, traces, label, label))
             else:
@@ -637,10 +694,16 @@ def build_comparison_tab(data: dict) -> tuple[str, str]:
         row = [f"<td>{label}</td>"]
         for sw in SOFTWARES:
             size_dict = data.get(sw, {})
-            xs = sorted(k for k in size_dict if size_dict[k].get("status") == "success")
-            ys = [size_dict[s].get(metric) for s in xs]
-            xs_f = [x for x, y in zip(xs, ys) if isinstance(y, (int, float))]
-            ys_f = [y for y in ys if isinstance(y, (int, float))]
+            # Use mean across successful replicates per size for R² fit
+            xs_f, ys_f = [], []
+            for size in sorted(size_dict):
+                reps = size_dict[size]
+                vals = [r.get(metric) for r in reps
+                        if r.get("status") == "success"
+                        and isinstance(r.get(metric), (int, float))]
+                if vals:
+                    xs_f.append(size)
+                    ys_f.append(_mean(vals))
             r2 = compute_r2(xs_f, ys_f)
             if r2 is None:
                 cell = "<td>—</td>"
@@ -655,10 +718,12 @@ def build_comparison_tab(data: dict) -> tuple[str, str]:
 
 
 def build_software_tab(sw: str, data: dict) -> tuple[str, str]:
-    """HTML + JS for a single software's tab."""
-    label    = SOFT_LABEL.get(sw, sw)
+    """HTML + JS for a single software's tab.
+    Each chart shows individual replicate lines (light) + mean line (bold) + linear fit.
+    """
+    label     = SOFT_LABEL.get(sw, sw)
     size_dict = data.get(sw, {})
-    sizes    = sorted(size_dict)
+    sizes     = sorted(size_dict)
 
     html_parts = [f'<div class="section-title">{label} — Scalability Metrics</div>']
     js_parts   = []
@@ -672,55 +737,96 @@ def build_software_tab(sw: str, data: dict) -> tuple[str, str]:
         ("disk_used_gb_max",    "Disk peak (GB)"),
     ]
 
+    # Determine how many replicates exist (max across sizes)
+    n_reps = max((len(size_dict[s]) for s in sizes), default=1)
+
     html_parts.append('<div class="grid-3">')
     for metric, mlabel in pairs:
         div_id = f"chart_{sw}_{metric}"
         html_parts.append(f'<div class="card"><div id="{div_id}" style="height:260px"></div></div>')
-        xs, ys = [], []
+
+        # Collect per-rep series
+        rep_series: dict[int, tuple[list, list]] = {}  # rep_idx → (xs, ys)
         for s in sizes:
-            rec = size_dict[s]
-            if rec.get("status") != "success":
-                continue
-            v = rec.get(metric)
-            if isinstance(v, (int, float)):
-                xs.append(s)
-                ys.append(v)
+            for rep_data in size_dict[s]:
+                if rep_data.get("status") != "success":
+                    continue
+                v = rep_data.get(metric)
+                if not isinstance(v, (int, float)):
+                    continue
+                rep_n = rep_data.get("replicate", 1)
+                rep_series.setdefault(rep_n, ([], []))
+                rep_series[rep_n][0].append(s)
+                rep_series[rep_n][1].append(v)
+
+        # Compute mean series
+        mean_xs, mean_ys = [], []
+        for s in sizes:
+            vals = [
+                r.get(metric) for r in size_dict[s]
+                if r.get("status") == "success" and isinstance(r.get(metric), (int, float))
+            ]
+            if vals:
+                mean_xs.append(s)
+                mean_ys.append(_mean(vals))
+
         traces = []
-        if xs:
-            r2  = compute_r2(xs, ys)
+        if mean_xs:
+            # Per-rep light traces (no error bars, faded)
+            if n_reps > 1:
+                for rep_n, (rxs, rys) in sorted(rep_series.items()):
+                    traces.append(_js_trace(
+                        sw, rxs, rys, mlabel,
+                        name=f"Rep {rep_n}",
+                        alpha=0.35,
+                        show_legend=(rep_n == 1),
+                    ))
+            # Mean trace (bold, with error bars if multiple reps)
+            mean_errs = []
+            if n_reps > 1:
+                for s in mean_xs:
+                    vals = [
+                        r.get(metric) for r in size_dict[s]
+                        if r.get("status") == "success" and isinstance(r.get(metric), (int, float))
+                    ]
+                    mean_errs.append(_std(vals))
+            traces.append(_js_trace(
+                sw, mean_xs, mean_ys, mlabel,
+                y_errs=mean_errs if mean_errs else None,
+                name=f"{SOFT_LABEL.get(sw, sw)} mean" if n_reps > 1 else SOFT_LABEL.get(sw, sw),
+            ))
+            # Linear fit on mean
+            r2  = compute_r2(mean_xs, mean_ys)
             r2s = f" (R²={r2:.3f})" if r2 is not None else ""
-            traces.append(_js_trace(sw, xs, ys, mlabel))
-            # Add linear fit trace
-            slope, intercept = _linreg(xs, ys)
+            slope, intercept = _linreg(mean_xs, mean_ys)
             if slope is not None:
-                fit_ys = [round(slope * x + intercept, 3) for x in xs]
-                fit_trace = json.dumps({
-                    "x": xs, "y": fit_ys,
+                fit_ys = [round(slope * x + intercept, 3) for x in mean_xs]
+                traces.append(json.dumps({
+                    "x": mean_xs, "y": fit_ys,
                     "name": "Linear fit",
                     "mode": "lines",
                     "line": {"dash": "dash", "color": "#aaa", "width": 1},
+                    "showlegend": False,
                     "hoverinfo": "skip",
-                })
-                traces.append(fit_trace)
-            js_parts.append(_make_chart_js(div_id, traces,
-                                           f"{mlabel}{r2s}", mlabel))
+                }))
+            js_parts.append(_make_chart_js(div_id, traces, f"{mlabel}{r2s}", mlabel))
         else:
             js_parts.append(f"document.getElementById('{div_id}').innerHTML='<p style=\"padding:20px;color:#888\">No data</p>';")
     html_parts.append("</div>")
 
-    # Inflection points
+    # Inflection points (on mean series)
     inf_rows = []
     for metric, mlabel in pairs:
-        xs, ys = [], []
+        mean_xs, mean_ys = [], []
         for s in sizes:
-            rec = size_dict[s]
-            if rec.get("status") != "success":
-                continue
-            v = rec.get(metric)
-            if isinstance(v, (int, float)):
-                xs.append(s)
-                ys.append(v)
-        for inf in find_inflections(xs, ys):
+            vals = [
+                r.get(metric) for r in size_dict[s]
+                if r.get("status") == "success" and isinstance(r.get(metric), (int, float))
+            ]
+            if vals:
+                mean_xs.append(s)
+                mean_ys.append(_mean(vals))
+        for inf in find_inflections(mean_xs, mean_ys):
             inf_rows.append({**inf, "metric": mlabel})
 
     if inf_rows:
@@ -735,33 +841,34 @@ def build_software_tab(sw: str, data: dict) -> tuple[str, str]:
             )
         html_parts.append("</table></div>")
 
-    # Detailed results table
+    # Detailed results table — one row per (size, replicate)
     html_parts.append(f'<div class="section-title">{label} — Run Details</div>')
-    html_parts.append('<div class="card"><table>')
+    html_parts.append('<div class="card" style="overflow-x:auto"><table>')
     html_parts.append(
-        "<tr><th>Size</th><th>Status</th><th>Wall Time (s)</th>"
+        "<tr><th>Size</th><th>Rep</th><th>Status</th><th>Wall Time (s)</th>"
         "<th>CPU avg%</th><th>GPU util%</th><th>RAM avg GB</th>"
         "<th>Variants</th></tr>"
     )
+
+    def _fmt(v):
+        return f"{v:.2f}" if isinstance(v, float) else str(v)
+
     for s in sizes:
-        rec     = size_dict[s]
-        status  = rec.get("status", "unknown")
-        cls     = "success" if status == "success" else ("skipped" if "skip" in status else "failed")
-        wt      = rec.get("wall_time_s", 0)
-        cpu     = rec.get("cpu_pct_avg", "—")
-        gpu     = rec.get("gpu_util_pct_avg", "—")
-        ram     = rec.get("ram_used_gb_avg", "—")
-        variants = rec.get("variant_count", "—")
-
-        def _fmt(v):
-            return f"{v:.2f}" if isinstance(v, float) else str(v)
-
-        html_parts.append(
-            f"<tr><td>{s}</td>"
-            f'<td><span class="badge badge-{cls}">{status}</span></td>'
-            f"<td>{wt:.1f}</td><td>{_fmt(cpu)}</td><td>{_fmt(gpu)}</td>"
-            f"<td>{_fmt(ram)}</td><td>{variants}</td></tr>"
-        )
+        for rep_data in size_dict[s]:
+            status   = rep_data.get("status", "unknown")
+            cls      = "success" if status == "success" else ("skipped" if "skip" in status else "failed")
+            rep_n    = rep_data.get("replicate", "—")
+            wt       = rep_data.get("wall_time_s", 0)
+            cpu      = rep_data.get("cpu_pct_avg", "—")
+            gpu      = rep_data.get("gpu_util_pct_avg", "—")
+            ram      = rep_data.get("ram_used_gb_avg", "—")
+            variants = rep_data.get("variant_count", "—")
+            html_parts.append(
+                f"<tr><td>{s}</td><td>{rep_n}</td>"
+                f'<td><span class="badge badge-{cls}">{status}</span></td>'
+                f"<td>{wt:.1f}</td><td>{_fmt(cpu)}</td><td>{_fmt(gpu)}</td>"
+                f"<td>{_fmt(ram)}</td><td>{variants}</td></tr>"
+            )
     html_parts.append("</table></div>")
 
     return "\n".join(html_parts), "\n".join(js_parts)
@@ -772,12 +879,12 @@ def build_rawdata_tab(data: dict) -> str:
     for sw in SOFTWARES:
         size_dict = data.get(sw, {})
         for size in sorted(size_dict):
-            rec = size_dict[size]
-            rows.append(rec)
+            for rec in size_dict[size]:   # iterate over replicates
+                rows.append(rec)
 
     html = ['<div class="section-title">Raw Benchmark Data</div>',
             '<div class="card" style="overflow-x:auto"><table>',
-            "<tr><th>Software</th><th>Size</th><th>Status</th>"
+            "<tr><th>Software</th><th>Size</th><th>Rep</th><th>Status</th>"
             "<th>Wall Time (s)</th><th>CPU avg%</th><th>CPU peak%</th>"
             "<th>GPU util%</th><th>GPU peak%</th><th>GPU Mem MB</th>"
             "<th>RAM avg GB</th><th>RAM peak GB</th><th>Disk peak GB</th>"
@@ -793,6 +900,7 @@ def build_rawdata_tab(data: dict) -> str:
         html.append(
             f"<tr><td>{SOFT_LABEL.get(sw, sw)}</td>"
             f"<td>{rec.get('dataset_size','—')}</td>"
+            f"<td>{rec.get('replicate','—')}</td>"
             f'<td><span class="badge badge-{cls}">{status}</span></td>'
             f"<td>{g('wall_time_s')}</td>"
             f"<td>{g('cpu_pct_avg')}</td><td>{g('cpu_pct_max')}</td>"

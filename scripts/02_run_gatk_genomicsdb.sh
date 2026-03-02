@@ -102,33 +102,34 @@ build_interval_args() {
 # ─── Per-size runner ──────────────────────────────────────────────────────────
 run_size() {
     local size="$1"
+    local rep="$2"
 
-    local dataset_dir="${BENCHMARK_DIR}/01_prep/dataset_${size}"
+    local dataset_dir="${BENCHMARK_DIR}/01_prep/dataset_${size}_rep${rep}"
     local manifest="${dataset_dir}/manifest.txt"
-    local output_dir="${BENCHMARK_DIR}/02_execution/${SOFTWARE}/dataset_${size}"
+    local output_dir="${BENCHMARK_DIR}/02_execution/${SOFTWARE}/dataset_${size}_rep${rep}"
     local output_vcf="${output_dir}/output.vcf.gz"
     local workspace="${output_dir}/genomicsdb_workspace"
     local intervals_file="${output_dir}/intervals.list"
     local stderr_log="${output_dir}/stderr.log"
     local monitor_json="${output_dir}/monitor.json"
-    local metrics_json="${BENCHMARK_DIR}/03_metrics/metrics_${SOFTWARE}_${size}.json"
+    local metrics_json="${BENCHMARK_DIR}/03_metrics/metrics_${SOFTWARE}_${size}_rep${rep}.json"
     local tmp_dir="${output_dir}/tmp"
 
     mkdir -p "${output_dir}" "${tmp_dir}"
 
     if is_done "${output_dir}"; then
-        log "GATK_GDB" "[dataset_${size}] Already completed — skipping"
+        log "GATK_GDB" "[dataset_${size}_rep${rep}] Already completed — skipping"
         return 0
     fi
 
     if [[ ! -f "${manifest}" ]]; then
-        warn "GATK_GDB" "[dataset_${size}] manifest.txt not found — run preparation first"
+        warn "GATK_GDB" "[dataset_${size}_rep${rep}] manifest.txt not found — run preparation first"
         return 1
     fi
 
     local gvcf_count
     gvcf_count=$(wc -l < "${manifest}")
-    log "GATK_GDB" "[dataset_${size}] Starting — ${gvcf_count} GVCFs"
+    log "GATK_GDB" "[dataset_${size}_rep${rep}] Starting — ${gvcf_count} GVCFs"
 
     # Clean up any leftovers from a previous failed run
     rm -rf "${workspace}" "${output_vcf}" "${output_vcf}.tbi"
@@ -149,10 +150,10 @@ run_size() {
     local l_args=()
     build_interval_args l_args "${intervals_file}"
     if [[ "${#l_args[@]}" -eq 0 ]]; then
-        warn "GATK_GDB" "[dataset_${size}] No intervals — aborting"
+        warn "GATK_GDB" "[dataset_${size}_rep${rep}] No intervals — aborting"
         return 1
     fi
-    log "GATK_GDB" "[dataset_${size}] Using ${#l_args[@]} interval argument(s)"
+    log "GATK_GDB" "[dataset_${size}_rep${rep}] Using ${#l_args[@]} interval argument(s)"
 
     # Start resource monitor (covers both GATK steps)
     start_monitor "${monitor_json}"
@@ -163,7 +164,7 @@ run_size() {
 
     # ── Step A: GenomicsDBImport ──────────────────────────────────────────────
     # NOTE: env -u LD_PRELOAD — same jemalloc + JVM SIGSEGV guard as 02_run_gatk.sh
-    log "GATK_GDB" "[dataset_${size}] Step A: GenomicsDBImport..."
+    log "GATK_GDB" "[dataset_${size}_rep${rep}] Step A: GenomicsDBImport..."
     env -u LD_PRELOAD "${GATK_BIN}" --java-options "${GATK_JAVA_OPTS}" \
         GenomicsDBImport \
         "${v_args[@]}" \
@@ -176,12 +177,12 @@ run_size() {
     || exit_code=$?
 
     if [[ "${exit_code}" -ne 0 ]]; then
-        warn "GATK_GDB" "[dataset_${size}] GenomicsDBImport failed (exit_code=${exit_code}) — see ${stderr_log}"
+        warn "GATK_GDB" "[dataset_${size}_rep${rep}] GenomicsDBImport failed (exit_code=${exit_code}) — see ${stderr_log}"
     fi
 
     # ── Step B: GenotypeGVCFs (via gendb://) ─────────────────────────────────
     if [[ "${exit_code}" -eq 0 ]]; then
-        log "GATK_GDB" "[dataset_${size}] Step B: GenotypeGVCFs (gendb)..."
+        log "GATK_GDB" "[dataset_${size}_rep${rep}] Step B: GenotypeGVCFs (gendb)..."
         env -u LD_PRELOAD "${GATK_BIN}" --java-options "${GATK_JAVA_OPTS}" \
             GenotypeGVCFs \
             -R  "${REF_GENOME}" \
@@ -208,14 +209,14 @@ run_size() {
 
     if [[ "${exit_code}" -ne 0 ]]; then
         status="failed"
-        warn "GATK_GDB" "[dataset_${size}] exit_code=${exit_code} — see ${stderr_log}"
+        warn "GATK_GDB" "[dataset_${size}_rep${rep}] exit_code=${exit_code} — see ${stderr_log}"
     else
         if validate_vcf "${output_vcf}"; then
             output_valid="true"
             variant_count=${VARIANT_COUNT}
         else
             status="invalid_output"
-            warn "GATK_GDB" "[dataset_${size}] Output VCF validation failed"
+            warn "GATK_GDB" "[dataset_${size}_rep${rep}] Output VCF validation failed"
         fi
     fi
 
@@ -225,7 +226,7 @@ run_size() {
         "${output_vcf}"   "${output_valid}" "${variant_count}" \
         "${monitor_json}"
 
-    log "GATK_GDB" "[dataset_${size}] Done — status=${status} wall_time=${wall_time}s variants=${variant_count}"
+    log "GATK_GDB" "[dataset_${size}_rep${rep}] Done — status=${status} wall_time=${wall_time}s variants=${variant_count}"
 
     if [[ "${status}" == "success" ]]; then
         mark_done "${output_dir}"
@@ -235,14 +236,17 @@ run_size() {
 # ─── Main ─────────────────────────────────────────────────────────────────────
 main() {
     log "GATK_GDB" "============================================================"
-    log "GATK_GDB" "GATK GenomicsDB Benchmark — sizes: ${DATASET_SIZES[*]}"
+    log "GATK_GDB" "GATK GenomicsDB Benchmark — sizes: ${DATASET_SIZES[*]}  replicates: ${BENCHMARK_REPLICATES}"
     log "GATK_GDB" "============================================================"
 
     check_prerequisites
 
     local any_failed=0
     for size in "${DATASET_SIZES[@]}"; do
-        run_size "${size}" || { warn "GATK_GDB" "dataset_${size} failed (continuing)"; any_failed=1; }
+        for rep in $(seq 1 "${BENCHMARK_REPLICATES}"); do
+            run_size "${size}" "${rep}" \
+                || { warn "GATK_GDB" "dataset_${size}_rep${rep} failed (continuing)"; any_failed=1; }
+        done
     done
 
     log "GATK_GDB" "GATK GenomicsDB benchmark complete."

@@ -23,9 +23,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-SOFTWARES = ["glnexus", "parabricks", "gatk", "gatk_genomicsdb"]
-SIZES     = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-BIN_WIDTH = 5   # GQ histogram bins: [0,5), [5,10), … [95,100]
+SOFTWARES   = ["glnexus", "parabricks", "gatk", "gatk_genomicsdb"]
+SIZES       = [10, 25, 50, 75, 100]
+REPLICATES  = [1, 2, 3]
+BIN_WIDTH   = 5   # GQ histogram bins: [0,5), [5,10), … [95,100]
 
 
 # ─── bcftools wrappers ────────────────────────────────────────────────────────
@@ -139,8 +140,8 @@ def compute_overlap(id_sets: dict[str, set]) -> dict:
 
 # ─── Per-size runners ─────────────────────────────────────────────────────────
 
-def _load_run_metrics(metrics_dir: Path, software: str, size: int) -> dict | None:
-    p = metrics_dir / f"metrics_{software}_{size}.json"
+def _load_run_metrics(metrics_dir: Path, software: str, size: int, rep: int) -> dict | None:
+    p = metrics_dir / f"metrics_{software}_{size}_rep{rep}.json"
     if not p.exists():
         return None
     try:
@@ -151,20 +152,20 @@ def _load_run_metrics(metrics_dir: Path, software: str, size: int) -> dict | Non
 
 
 def analyze_gq(
-    metrics_dir: Path, software: str, size: int, force: bool
+    metrics_dir: Path, software: str, size: int, rep: int, force: bool
 ) -> dict | None:
     """Extract GQ histogram for one run. Returns the data dict or None."""
-    out = metrics_dir / f"variant_analysis_{software}_{size}.json"
+    out = metrics_dir / f"variant_analysis_{software}_{size}_rep{rep}.json"
 
     if out.exists() and not force:
-        print(f"[ANALYZE] {software} N={size}: already done — skip")
+        print(f"[ANALYZE] {software} N={size} rep{rep}: already done — skip")
         try:
             with open(out) as f:
                 return json.load(f)
         except Exception:
             pass
 
-    rec = _load_run_metrics(metrics_dir, software, size)
+    rec = _load_run_metrics(metrics_dir, software, size, rep)
     if rec is None:
         return None
     if rec.get("status") != "success":
@@ -172,22 +173,23 @@ def analyze_gq(
 
     vcf_path = rec.get("output_vcf", "")
     if not vcf_path or not os.path.isfile(vcf_path):
-        print(f"[ANALYZE] {software} N={size}: VCF not found ({vcf_path}) — skip")
+        print(f"[ANALYZE] {software} N={size} rep{rep}: VCF not found ({vcf_path}) — skip")
         return None
 
-    print(f"[ANALYZE] {software} N={size}: extracting GQ …")
+    print(f"[ANALYZE] {software} N={size} rep{rep}: extracting GQ …")
     hist, total = extract_gq_histogram(vcf_path)
 
     if total == 0:
-        print(f"[WARN] {software} N={size}: no GQ values extracted", file=sys.stderr)
+        print(f"[WARN] {software} N={size} rep{rep}: no GQ values extracted", file=sys.stderr)
         return None
 
     data = {
-        "software":       software,
-        "dataset_size":   size,
-        "gq_histogram":   hist,
+        "software":        software,
+        "dataset_size":    size,
+        "replicate":       rep,
+        "gq_histogram":    hist,
         "total_genotypes": total,
-        "vcf_path":       vcf_path,
+        "vcf_path":        vcf_path,
     }
     with open(out, "w") as f:
         json.dump(data, f, indent=2)
@@ -195,34 +197,35 @@ def analyze_gq(
     return data
 
 
-def analyze_overlap(metrics_dir: Path, size: int, force: bool) -> None:
-    """Compute variant overlap across all tools for one dataset size."""
-    out = metrics_dir / f"variant_overlap_{size}.json"
+def analyze_overlap(metrics_dir: Path, size: int, rep: int, force: bool) -> None:
+    """Compute variant overlap across all tools for one dataset size/replicate."""
+    out = metrics_dir / f"variant_overlap_{size}_rep{rep}.json"
 
     if out.exists() and not force:
-        print(f"[OVERLAP] N={size}: already done — skip")
+        print(f"[OVERLAP] N={size} rep{rep}: already done — skip")
         return
 
     id_sets: dict[str, set] = {}
     for software in SOFTWARES:
-        rec = _load_run_metrics(metrics_dir, software, size)
+        rec = _load_run_metrics(metrics_dir, software, size, rep)
         if rec is None or rec.get("status") != "success":
             continue
         vcf_path = rec.get("output_vcf", "")
         if not vcf_path or not os.path.isfile(vcf_path):
             continue
-        print(f"[OVERLAP] {software} N={size}: extracting variant IDs …")
+        print(f"[OVERLAP] {software} N={size} rep{rep}: extracting variant IDs …")
         ids = extract_variant_ids(vcf_path)
         if ids:
             id_sets[software] = ids
-            print(f"[OVERLAP] {software} N={size}: {len(ids):,} variants")
+            print(f"[OVERLAP] {software} N={size} rep{rep}: {len(ids):,} variants")
 
     if len(id_sets) < 2:
-        print(f"[OVERLAP] N={size}: fewer than 2 tools with results — skip")
+        print(f"[OVERLAP] N={size} rep{rep}: fewer than 2 tools with results — skip")
         return
 
     overlap = compute_overlap(id_sets)
     overlap["dataset_size"] = size
+    overlap["replicate"] = rep
 
     with open(out, "w") as f:
         json.dump(overlap, f, indent=2)
@@ -257,14 +260,16 @@ def main():
               file=sys.stderr)
         sys.exit(1)
 
-    # GQ histograms (independent per software × size)
+    # GQ histograms (per software × size × replicate)
     for sw in SOFTWARES:
         for size in SIZES:
-            analyze_gq(metrics_dir, sw, size, args.force)
+            for rep in REPLICATES:
+                analyze_gq(metrics_dir, sw, size, rep, args.force)
 
-    # Inter-tool variant overlap
+    # Inter-tool variant overlap (per size × replicate)
     for size in SIZES:
-        analyze_overlap(metrics_dir, size, args.force)
+        for rep in REPLICATES:
+            analyze_overlap(metrics_dir, size, rep, args.force)
 
     print("[ANALYZE] Done.")
 

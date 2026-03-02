@@ -24,36 +24,38 @@ check_prerequisites() {
     fi
     log "GLNEXUS" "Using: $(command -v ${GLNEXUS_BIN})"
     log "GLNEXUS" "Config preset: ${GLNEXUS_CONFIG}"
+    log "GLNEXUS" "Threads: ${GLNEXUS_THREADS}  Mem: ${GLNEXUS_MEM_GB}g  bcftools threads: ${BCFTOOLS_THREADS}"
 }
 
 # ─── Per-size runner ──────────────────────────────────────────────────────────
 run_size() {
     local size="$1"
+    local rep="$2"
 
-    local dataset_dir="${BENCHMARK_DIR}/01_prep/dataset_${size}"
+    local dataset_dir="${BENCHMARK_DIR}/01_prep/dataset_${size}_rep${rep}"
     local manifest="${dataset_dir}/manifest.txt"
-    local output_dir="${BENCHMARK_DIR}/02_execution/${SOFTWARE}/dataset_${size}"
+    local output_dir="${BENCHMARK_DIR}/02_execution/${SOFTWARE}/dataset_${size}_rep${rep}"
     local output_vcf="${output_dir}/output.vcf"
     local stderr_log="${output_dir}/stderr.log"
     local monitor_json="${output_dir}/monitor.json"
-    local metrics_json="${BENCHMARK_DIR}/03_metrics/metrics_${SOFTWARE}_${size}.json"
-    local work_dir="/tmp/glnexus_bench_${size}_$$"
+    local metrics_json="${BENCHMARK_DIR}/03_metrics/metrics_${SOFTWARE}_${size}_rep${rep}.json"
+    local work_dir="/tmp/glnexus_bench_${size}_rep${rep}_$$"
 
     mkdir -p "${output_dir}"
 
     if is_done "${output_dir}"; then
-        log "GLNEXUS" "[dataset_${size}] Already completed — skipping (delete .done to rerun)"
+        log "GLNEXUS" "[dataset_${size}_rep${rep}] Already completed — skipping"
         return 0
     fi
 
     if [[ ! -f "${manifest}" ]]; then
-        warn "GLNEXUS" "[dataset_${size}] manifest.txt not found — run preparation first"
+        warn "GLNEXUS" "[dataset_${size}_rep${rep}] manifest.txt not found — run preparation first"
         return 1
     fi
 
     local gvcf_count
     gvcf_count=$(wc -l < "${manifest}")
-    log "GLNEXUS" "[dataset_${size}] Starting — ${gvcf_count} GVCFs, config=${GLNEXUS_CONFIG}"
+    log "GLNEXUS" "[dataset_${size}_rep${rep}] Starting — ${gvcf_count} GVCFs, config=${GLNEXUS_CONFIG}"
 
     # Ensure GVCFs are bgzipped + indexed (GLnexus requirement)
     local ready_manifest="${output_dir}/manifest_ready.txt"
@@ -78,13 +80,15 @@ run_size() {
 
     rm -rf "${work_dir}"
 
-    log "GLNEXUS" "[dataset_${size}] Executing glnexus_cli..."
+    log "GLNEXUS" "[dataset_${size}_rep${rep}] Executing glnexus_cli..."
     "${GLNEXUS_BIN}" \
-        --config "${GLNEXUS_CONFIG}" \
-        --dir    "${work_dir}" \
-        --list   "${ready_manifest}" \
+        --config    "${GLNEXUS_CONFIG}" \
+        --dir       "${work_dir}" \
+        --list      "${ready_manifest}" \
+        --threads   "${GLNEXUS_THREADS}" \
+        --mem-gbytes "${GLNEXUS_MEM_GB}" \
         2>"${stderr_log}" \
-    | bcftools view - -O v -o "${output_vcf}" \
+    | bcftools view - -O v --threads "${BCFTOOLS_THREADS}" -o "${output_vcf}" \
         2>>"${stderr_log}" \
     || exit_code=$?
 
@@ -104,14 +108,14 @@ run_size() {
 
     if [[ "${exit_code}" -ne 0 ]]; then
         status="failed"
-        warn "GLNEXUS" "[dataset_${size}] exit_code=${exit_code} — see ${stderr_log}"
+        warn "GLNEXUS" "[dataset_${size}_rep${rep}] exit_code=${exit_code} — see ${stderr_log}"
     else
         if validate_vcf "${output_vcf}"; then
             output_valid="true"
             variant_count=${VARIANT_COUNT}
         else
             status="invalid_output"
-            warn "GLNEXUS" "[dataset_${size}] Output VCF validation failed"
+            warn "GLNEXUS" "[dataset_${size}_rep${rep}] Output VCF validation failed"
         fi
     fi
 
@@ -121,7 +125,7 @@ run_size() {
         "${output_vcf}"   "${output_valid}" "${variant_count}" \
         "${monitor_json}"
 
-    log "GLNEXUS" "[dataset_${size}] Done — status=${status} wall_time=${wall_time}s variants=${variant_count}"
+    log "GLNEXUS" "[dataset_${size}_rep${rep}] Done — status=${status} wall_time=${wall_time}s variants=${variant_count}"
 
     if [[ "${status}" == "success" ]]; then
         mark_done "${output_dir}"
@@ -131,14 +135,17 @@ run_size() {
 # ─── Main ─────────────────────────────────────────────────────────────────────
 main() {
     log "GLNEXUS" "============================================================"
-    log "GLNEXUS" "GLnexus Benchmark — sizes: ${DATASET_SIZES[*]}"
+    log "GLNEXUS" "GLnexus Benchmark — sizes: ${DATASET_SIZES[*]}  replicates: ${BENCHMARK_REPLICATES}"
     log "GLNEXUS" "============================================================"
 
     check_prerequisites
 
     local any_failed=0
     for size in "${DATASET_SIZES[@]}"; do
-        run_size "${size}" || { warn "GLNEXUS" "dataset_${size} failed (continuing)"; any_failed=1; }
+        for rep in $(seq 1 "${BENCHMARK_REPLICATES}"); do
+            run_size "${size}" "${rep}" \
+                || { warn "GLNEXUS" "dataset_${size}_rep${rep} failed (continuing)"; any_failed=1; }
+        done
     done
 
     log "GLNEXUS" "GLnexus benchmark complete."

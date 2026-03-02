@@ -48,32 +48,33 @@ check_prerequisites() {
 # ─── Per-size runner ──────────────────────────────────────────────────────────
 run_size() {
     local size="$1"
+    local rep="$2"
 
-    local dataset_dir="${BENCHMARK_DIR}/01_prep/dataset_${size}"
+    local dataset_dir="${BENCHMARK_DIR}/01_prep/dataset_${size}_rep${rep}"
     local manifest="${dataset_dir}/manifest.txt"
-    local output_dir="${BENCHMARK_DIR}/02_execution/${SOFTWARE}/dataset_${size}"
+    local output_dir="${BENCHMARK_DIR}/02_execution/${SOFTWARE}/dataset_${size}_rep${rep}"
     local output_vcf="${output_dir}/output.vcf.gz"
     local combined_gvcf="${output_dir}/combined.g.vcf.gz"
     local stderr_log="${output_dir}/stderr.log"
     local monitor_json="${output_dir}/monitor.json"
-    local metrics_json="${BENCHMARK_DIR}/03_metrics/metrics_${SOFTWARE}_${size}.json"
+    local metrics_json="${BENCHMARK_DIR}/03_metrics/metrics_${SOFTWARE}_${size}_rep${rep}.json"
     local tmp_dir="${output_dir}/tmp"
 
     mkdir -p "${output_dir}" "${tmp_dir}"
 
     if is_done "${output_dir}"; then
-        log "GATK" "[dataset_${size}] Already completed — skipping"
+        log "GATK" "[dataset_${size}_rep${rep}] Already completed — skipping"
         return 0
     fi
 
     if [[ ! -f "${manifest}" ]]; then
-        warn "GATK" "[dataset_${size}] manifest.txt not found — run preparation first"
+        warn "GATK" "[dataset_${size}_rep${rep}] manifest.txt not found — run preparation first"
         return 1
     fi
 
     local gvcf_count
     gvcf_count=$(wc -l < "${manifest}")
-    log "GATK" "[dataset_${size}] Starting — ${gvcf_count} GVCFs"
+    log "GATK" "[dataset_${size}_rep${rep}] Starting — ${gvcf_count} GVCFs"
 
     # Clean up any leftover intermediate files from a previous failed run
     rm -f "${combined_gvcf}" "${combined_gvcf}.tbi"
@@ -102,7 +103,7 @@ run_size() {
     # before invoking the JVM — libjemalloc conflicts with Java's allocator
     # and causes an immediate SIGSEGV (exit 245).  We use `env -u LD_PRELOAD`
     # so the parent shell's LD_PRELOAD is unaffected.
-    log "GATK" "[dataset_${size}] Step A: CombineGVCFs..."
+    log "GATK" "[dataset_${size}_rep${rep}] Step A: CombineGVCFs..."
     env -u LD_PRELOAD "${GATK_BIN}" --java-options "${GATK_JAVA_OPTS}" \
         CombineGVCFs \
         -R "${REF_GENOME}" \
@@ -113,12 +114,12 @@ run_size() {
     || exit_code=$?
 
     if [[ "${exit_code}" -ne 0 ]]; then
-        warn "GATK" "[dataset_${size}] CombineGVCFs failed (exit_code=${exit_code}) — see ${stderr_log}"
+        warn "GATK" "[dataset_${size}_rep${rep}] CombineGVCFs failed (exit_code=${exit_code}) — see ${stderr_log}"
     fi
 
     # ── Step B: GenotypeGVCFs ────────────────────────────────────────────────
     if [[ "${exit_code}" -eq 0 ]]; then
-        log "GATK" "[dataset_${size}] Step B: GenotypeGVCFs..."
+        log "GATK" "[dataset_${size}_rep${rep}] Step B: GenotypeGVCFs..."
         env -u LD_PRELOAD "${GATK_BIN}" --java-options "${GATK_JAVA_OPTS}" \
             GenotypeGVCFs \
             -R "${REF_GENOME}" \
@@ -146,15 +147,14 @@ run_size() {
 
     if [[ "${exit_code}" -ne 0 ]]; then
         status="failed"
-        warn "GATK" "[dataset_${size}] exit_code=${exit_code} — see ${stderr_log}"
+        warn "GATK" "[dataset_${size}_rep${rep}] exit_code=${exit_code} — see ${stderr_log}"
     else
-        # output is .vcf.gz — validate via bcftools
         if validate_vcf "${output_vcf}"; then
             output_valid="true"
             variant_count=${VARIANT_COUNT}
         else
             status="invalid_output"
-            warn "GATK" "[dataset_${size}] Output VCF validation failed"
+            warn "GATK" "[dataset_${size}_rep${rep}] Output VCF validation failed"
         fi
     fi
 
@@ -164,7 +164,7 @@ run_size() {
         "${output_vcf}"   "${output_valid}" "${variant_count}" \
         "${monitor_json}"
 
-    log "GATK" "[dataset_${size}] Done — status=${status} wall_time=${wall_time}s variants=${variant_count}"
+    log "GATK" "[dataset_${size}_rep${rep}] Done — status=${status} wall_time=${wall_time}s variants=${variant_count}"
 
     if [[ "${status}" == "success" ]]; then
         mark_done "${output_dir}"
@@ -174,14 +174,17 @@ run_size() {
 # ─── Main ─────────────────────────────────────────────────────────────────────
 main() {
     log "GATK" "============================================================"
-    log "GATK" "GATK Benchmark — sizes: ${DATASET_SIZES[*]}"
+    log "GATK" "GATK Benchmark — sizes: ${DATASET_SIZES[*]}  replicates: ${BENCHMARK_REPLICATES}"
     log "GATK" "============================================================"
 
     check_prerequisites
 
     local any_failed=0
     for size in "${DATASET_SIZES[@]}"; do
-        run_size "${size}" || { warn "GATK" "dataset_${size} failed (continuing)"; any_failed=1; }
+        for rep in $(seq 1 "${BENCHMARK_REPLICATES}"); do
+            run_size "${size}" "${rep}" \
+                || { warn "GATK" "dataset_${size}_rep${rep} failed (continuing)"; any_failed=1; }
+        done
     done
 
     log "GATK" "GATK benchmark complete."

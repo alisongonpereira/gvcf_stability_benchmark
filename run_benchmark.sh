@@ -151,6 +151,7 @@ run_preparation() {
         --input-dir  "${INPUT_DIR}" \
         --output-dir "${BENCHMARK_DIR}/01_prep" \
         --sizes      "${DATASET_SIZES[@]}" \
+        --replicates "${BENCHMARK_REPLICATES}" \
         --seed       "${RANDOM_SEED}" \
         --log        "${prep_log}" \
         ${force_flag}
@@ -203,8 +204,9 @@ main() {
     log "START" "================================================================="
     log "START" "GVCF Scalability Benchmark"
     log "START" "Started : ${ts_start}"
-    log "START" "Sizes   : ${DATASET_SIZES[*]}"
-    log "START" "Software: ${BENCHMARK_SOFTWARES[*]}"
+    log "START" "Sizes      : ${DATASET_SIZES[*]}"
+    log "START" "Replicates : ${BENCHMARK_REPLICATES}"
+    log "START" "Software   : ${BENCHMARK_SOFTWARES[*]}"
     [[ -n "${ONLY_SW}" ]] && log "START" "Filter  : --only ${ONLY_SW}"
     log "START" "================================================================="
 
