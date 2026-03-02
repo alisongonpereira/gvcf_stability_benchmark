@@ -1,0 +1,20 @@
+[PB Info 2026-Mar-02 15:08:32] ------------------------------------------------------------------------------
+[PB Info 2026-Mar-02 15:08:32] ||                 Parabricks accelerated Genomics Pipeline                 ||
+[PB Info 2026-Mar-02 15:08:32] ||                              Version 4.5.1-1                             ||
+[PB Info 2026-Mar-02 15:08:32] ||                               genotypegvcf                               ||
+[PB Info 2026-Mar-02 15:08:32] ------------------------------------------------------------------------------
+[PB Info 2026-Mar-02 15:08:32] Checking if the index file exists for the input compressed file:/nfs/theseus/Local_Collaborators/dcas/CLARA_Exome/Germinative_v2/CLARA-118-01-RFN/vcf/CLARA-118-01-RFN.hc.g.vcf.gz for better performance
+[PB Info 2026-Mar-02 15:08:32] ProgressMeter -	Current-Locus	Elapsed-Minutes
+[PB Info 2026-Mar-02 15:08:33] ProgressMeter -	chr3:73183512	0.0
+[PB Info 2026-Mar-02 15:08:34] ProgressMeter -	chr7:15088873	0.0
+[PB Info 2026-Mar-02 15:08:35] ProgressMeter -	chr11:66529892	0.1
+[PB Info 2026-Mar-02 15:08:36] ProgressMeter -	chr16:20473857	0.1
+[PB Info 2026-Mar-02 15:08:37] ProgressMeter -	chr22:37985818	0.1
+[PB Info 2026-Mar-02 15:08:38] genotypeGVCF finished, total time is 6.015 seconds
+[PB Info 2026-Mar-02 15:08:38] ------------------------------------------------------------------------------
+[PB Info 2026-Mar-02 15:08:38] ||        Program:                                      genotypegvcf        ||
+[PB Info 2026-Mar-02 15:08:38] ||        Version:                                           4.5.1-1        ||
+[PB Info 2026-Mar-02 15:08:38] ||        Start Time:                       Mon Mar  2 15:08:32 2026        ||
+[PB Info 2026-Mar-02 15:08:38] ||        End Time:                         Mon Mar  2 15:08:38 2026        ||
+[PB Info 2026-Mar-02 15:08:38] ||        Total Time:                                      6 seconds        ||
+[PB Info 2026-Mar-02 15:08:38] ------------------------------------------------------------------------------

@@ -1,0 +1,1922 @@
+{
+  "software": "glnexus",
+  "dataset_size": 20,
+  "status": "success",
+  "exit_code": 0,
+  "wall_time_s": 177.0,
+  "start_time": "2026-03-02T14:38:00",
+  "end_time": "2026-03-02T14:40:57",
+  "output_vcf": "/nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_20/output.vcf",
+  "output_valid": true,
+  "variant_count": 3087313,
+  "resources": {
+    "cpu_pct": {
+      "avg": 23.169,
+      "max": 63.0,
+      "min": 0.0
+    },
+    "ram_used_gb": {
+      "avg": 84.369,
+      "max": 92.4,
+      "min": 67.477
+    },
+    "ram_available_gb": {
+      "avg": 415.538,
+      "max": 432.43,
+      "min": 407.507
+    },
+    "disk_used_gb": {
+      "avg": 1380.177,
+      "max": 1381.145,
+      "min": 1378.357
+    },
+    "disk_free_gb": {
+      "avg": 289.265,
+      "max": 291.085,
+      "min": 288.297
+    },
+    "gpu_util_pct": {
+      "avg": 0.029,
+      "max": 1.0,
+      "min": 0.0
+    },
+    "gpu_mem_util_pct": {
+      "avg": 0.0,
+      "max": 0.0,
+      "min": 0.0
+    },
+    "gpu_mem_used_mb": {
+      "avg": 53.486,
+      "max": 55.0,
+      "min": 52.0
+    },
+    "cpu_pct_avg": 23.169,
+    "cpu_pct_max": 63.0,
+    "ram_used_gb_avg": 84.369,
+    "ram_used_gb_max": 92.4,
+    "ram_available_gb_min": 407.507,
+    "gpu_util_pct_avg": 0.029,
+    "gpu_util_pct_max": 1.0,
+    "gpu_mem_used_mb_avg": 53.486,
+    "gpu_mem_used_mb_max": 55.0,
+    "disk_free_gb_final": 288.297,
+    "disk_used_gb_max": 1381.145
+  },
+  "resource_samples": [
+    {
+      "timestamp": "2026-03-02T11:38:00.207451",
+      "elapsed_s": 0.0,
+      "cpu_pct": 0.0,
+      "ram_used_gb": 67.477,
+      "ram_available_gb": 432.43,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1378.357,
+      "disk_free_gb": 291.085,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 1.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 55.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:38:05.294467",
+      "elapsed_s": 5.09,
+      "cpu_pct": 9.8,
+      "ram_used_gb": 70.712,
+      "ram_available_gb": 429.195,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1378.361,
+      "disk_free_gb": 291.08,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 55.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:38:10.379347",
+      "elapsed_s": 10.17,
+      "cpu_pct": 13.9,
+      "ram_used_gb": 74.611,
+      "ram_available_gb": 425.296,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1378.361,
+      "disk_free_gb": 291.08,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 55.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:38:15.461852",
+      "elapsed_s": 15.25,
+      "cpu_pct": 15.1,
+      "ram_used_gb": 78.91,
+      "ram_available_gb": 420.997,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1378.361,
+      "disk_free_gb": 291.08,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 55.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:38:20.544342",
+      "elapsed_s": 20.34,
+      "cpu_pct": 15.7,
+      "ram_used_gb": 83.295,
+      "ram_available_gb": 416.612,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1378.361,
+      "disk_free_gb": 291.08,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 55.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:38:25.632940",
+      "elapsed_s": 25.43,
+      "cpu_pct": 10.7,
+      "ram_used_gb": 85.98,
+      "ram_available_gb": 413.923,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1378.361,
+      "disk_free_gb": 291.08,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 55.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:38:30.718510",
+      "elapsed_s": 30.51,
+      "cpu_pct": 1.7,
+      "ram_used_gb": 86.345,
+      "ram_available_gb": 413.562,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1378.361,
+      "disk_free_gb": 291.08,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 55.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:38:35.822640",
+      "elapsed_s": 35.62,
+      "cpu_pct": 0.9,
+      "ram_used_gb": 86.281,
+      "ram_available_gb": 413.625,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1378.598,
+      "disk_free_gb": 290.843,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 55.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:38:40.903280",
+      "elapsed_s": 40.7,
+      "cpu_pct": 1.0,
+      "ram_used_gb": 86.26,
+      "ram_available_gb": 413.647,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1378.85,
+      "disk_free_gb": 290.591,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 53.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:38:45.982656",
+      "elapsed_s": 45.78,
+      "cpu_pct": 1.1,
+      "ram_used_gb": 86.098,
+      "ram_available_gb": 413.809,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1379.102,
+      "disk_free_gb": 290.34,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 53.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:38:51.063562",
+      "elapsed_s": 50.86,
+      "cpu_pct": 0.9,
+      "ram_used_gb": 86.043,
+      "ram_available_gb": 413.864,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1379.353,
+      "disk_free_gb": 290.089,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 52.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:38:56.142927",
+      "elapsed_s": 55.94,
+      "cpu_pct": 0.9,
+      "ram_used_gb": 86.033,
+      "ram_available_gb": 413.874,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1379.598,
+      "disk_free_gb": 289.844,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 52.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:39:01.253168",
+      "elapsed_s": 61.05,
+      "cpu_pct": 0.9,
+      "ram_used_gb": 86.012,
+      "ram_available_gb": 413.895,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1379.845,
+      "disk_free_gb": 289.597,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 52.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:39:06.337651",
+      "elapsed_s": 66.13,
+      "cpu_pct": 1.0,
+      "ram_used_gb": 86.065,
+      "ram_available_gb": 413.842,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1380.096,
+      "disk_free_gb": 289.346,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 52.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:39:11.420881",
+      "elapsed_s": 71.21,
+      "cpu_pct": 0.9,
+      "ram_used_gb": 86.015,
+      "ram_available_gb": 413.891,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1380.338,
+      "disk_free_gb": 289.103,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 52.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:39:16.500656",
+      "elapsed_s": 76.29,
+      "cpu_pct": 1.3,
+      "ram_used_gb": 86.126,
+      "ram_available_gb": 413.78,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1380.582,
+      "disk_free_gb": 288.859,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 52.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:39:21.576357",
+      "elapsed_s": 81.37,
+      "cpu_pct": 1.0,
+      "ram_used_gb": 86.088,
+      "ram_available_gb": 413.819,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1380.825,
+      "disk_free_gb": 288.616,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 52.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:39:26.654254",
+      "elapsed_s": 86.45,
+      "cpu_pct": 0.9,
+      "ram_used_gb": 86.073,
+      "ram_available_gb": 413.834,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.066,
+      "disk_free_gb": 288.376,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 53.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:39:31.762409",
+      "elapsed_s": 91.56,
+      "cpu_pct": 16.9,
+      "ram_used_gb": 73.376,
+      "ram_available_gb": 426.53,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.145,
+      "disk_free_gb": 288.297,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 53.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:39:36.862091",
+      "elapsed_s": 96.66,
+      "cpu_pct": 52.9,
+      "ram_used_gb": 90.635,
+      "ram_available_gb": 409.271,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.145,
+      "disk_free_gb": 288.297,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 53.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:39:41.942197",
+      "elapsed_s": 101.74,
+      "cpu_pct": 1.2,
+      "ram_used_gb": 90.189,
+      "ram_available_gb": 409.718,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.145,
+      "disk_free_gb": 288.297,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 53.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:39:47.024557",
+      "elapsed_s": 106.82,
+      "cpu_pct": 4.0,
+      "ram_used_gb": 91.46,
+      "ram_available_gb": 408.447,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 53.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:39:52.103327",
+      "elapsed_s": 111.9,
+      "cpu_pct": 27.6,
+      "ram_used_gb": 81.291,
+      "ram_available_gb": 418.616,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 53.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:39:57.192688",
+      "elapsed_s": 116.99,
+      "cpu_pct": 50.1,
+      "ram_used_gb": 79.488,
+      "ram_available_gb": 420.419,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 53.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:40:02.992328",
+      "elapsed_s": 122.79,
+      "cpu_pct": 51.5,
+      "ram_used_gb": 80.123,
+      "ram_available_gb": 419.784,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 53.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:40:08.500332",
+      "elapsed_s": 128.29,
+      "cpu_pct": 44.9,
+      "ram_used_gb": 81.409,
+      "ram_available_gb": 418.498,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 53.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:40:13.588872",
+      "elapsed_s": 133.38,
+      "cpu_pct": 49.2,
+      "ram_used_gb": 82.716,
+      "ram_available_gb": 417.19,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 54.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:40:18.680622",
+      "elapsed_s": 138.47,
+      "cpu_pct": 47.5,
+      "ram_used_gb": 83.827,
+      "ram_available_gb": 416.08,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 54.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:40:23.767332",
+      "elapsed_s": 143.56,
+      "cpu_pct": 51.1,
+      "ram_used_gb": 85.063,
+      "ram_available_gb": 414.844,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 54.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:40:28.881330",
+      "elapsed_s": 148.67,
+      "cpu_pct": 51.3,
+      "ram_used_gb": 86.561,
+      "ram_available_gb": 413.346,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 54.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:40:33.994702",
+      "elapsed_s": 153.79,
+      "cpu_pct": 55.8,
+      "ram_used_gb": 87.862,
+      "ram_available_gb": 412.044,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 54.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 37.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:40:39.085328",
+      "elapsed_s": 158.88,
+      "cpu_pct": 51.5,
+      "ram_used_gb": 89.212,
+      "ram_available_gb": 410.695,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 54.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:40:44.203657",
+      "elapsed_s": 164.0,
+      "cpu_pct": 63.0,
+      "ram_used_gb": 90.871,
+      "ram_available_gb": 409.036,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 54.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:40:49.292423",
+      "elapsed_s": 169.09,
+      "cpu_pct": 62.1,
+      "ram_used_gb": 92.4,
+      "ram_available_gb": 407.507,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 54.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-02T11:40:54.401477",
+      "elapsed_s": 174.19,
+      "cpu_pct": 52.6,
+      "ram_used_gb": 92.009,
+      "ram_available_gb": 407.898,
+      "ram_total_gb": 503.714,
+      "disk_used_gb": 1381.141,
+      "disk_free_gb": 288.301,
+      "disk_total_gb": 1758.857,
+      "gpus": [
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 53.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        },
+        {
+          "name": "NVIDIA DGX Display",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 4.0,
+          "mem_total_mb": 4096.0,
+          "temperature_c": 37.0
+        },
+        {
+          "name": "NVIDIA A100-SXM4-40GB",
+          "util_pct": 0.0,
+          "mem_util_pct": 0.0,
+          "mem_used_mb": 16.0,
+          "mem_total_mb": 40960.0,
+          "temperature_c": 38.0
+        }
+      ]
+    }
+  ]
+}

@@ -8,14 +8,27 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../config.sh"
 source "${SCRIPT_DIR}/common.sh"
+: "${PARABRICKS_GPU_DEVICES:=${PARABRICKS_GPU:-0}}"
 
 SOFTWARE="parabricks"
 
 # ─── Prerequisites check ──────────────────────────────────────────────────────
 check_prerequisites() {
-    if ! command -v "${PARABRICKS_BIN}" &>/dev/null; then
-        warn "PARABRICKS" "pbrun not found (${PARABRICKS_BIN}) — skipping Parabricks benchmark"
+    # if ! command -v "${PARABRICKS_BIN}" &>/dev/null; then
+    #     warn "PARABRICKS" "pbrun not found (${PARABRICKS_BIN}) — skipping Parabricks benchmark"
+    #     exit 0
+    # fi
+    if ! command -v docker &>/dev/null; then
+        warn "PARABRICKS" "docker not found — skipping Parabricks benchmark"
         exit 0
+    fi
+
+    # opcional: checar se a imagem existe localmente (não puxa nada)
+    if [[ -n "${PARABRICKS_DOCKER_IMAGE:-}" ]]; then
+        if ! docker image inspect "${PARABRICKS_DOCKER_IMAGE}" >/dev/null 2>&1; then
+            warn "PARABRICKS" "Docker image not found locally: ${PARABRICKS_DOCKER_IMAGE}"
+            exit 0
+        fi
     fi
 
     if [[ -z "${REF_GENOME}" ]]; then
@@ -89,12 +102,23 @@ run_size() {
     local exit_code=0
 
     log "PARABRICKS" "[dataset_${size}] Executing pbrun joint_genotyping..."
-    "${PARABRICKS_BIN}" joint_genotyping \
-        --ref     "${REF_GENOME}" \
+    # "${PARABRICKS_BIN}" joint_genotyping \
+    #     --ref     "${REF_GENOME}" \
+    #     "${ingvcf_args[@]}" \
+    #     --out-vcf "${output_vcf}" \
+    #     --gpus '"device=0,1,2,4"' \
+    #     2>"${stderr_log}" \
+    # || exit_code=$?
+    docker run --rm \
+    --gpus "\"device=${PARABRICKS_GPU_DEVICES}\"" \
+    -v /nfs:/nfs -v /home:/home \
+    -v /home/alisongonpereira/raid:/home/alisongonpereira/raid \
+    -w "${PWD}" \
+    "${PARABRICKS_DOCKER_IMAGE}" \
+    pbrun genotypegvcf \
+        --ref "${REF_GENOME}" \
         "${ingvcf_args[@]}" \
         --out-vcf "${output_vcf}" \
-        --num-gpus 1 \
-        --gpu-id  "${PARABRICKS_GPU}" \
         2>"${stderr_log}" \
     || exit_code=$?
 

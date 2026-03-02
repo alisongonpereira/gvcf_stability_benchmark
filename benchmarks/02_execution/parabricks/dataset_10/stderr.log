@@ -1,0 +1,19 @@
+[PB Info 2026-Mar-02 15:07:42] ------------------------------------------------------------------------------
+[PB Info 2026-Mar-02 15:07:42] ||                 Parabricks accelerated Genomics Pipeline                 ||
+[PB Info 2026-Mar-02 15:07:42] ||                              Version 4.5.1-1                             ||
+[PB Info 2026-Mar-02 15:07:42] ||                               genotypegvcf                               ||
+[PB Info 2026-Mar-02 15:07:42] ------------------------------------------------------------------------------
+[PB Info 2026-Mar-02 15:07:42] Checking if the index file exists for the input compressed file:/nfs/theseus/Local_Collaborators/dcas/CLARA_Exome/Germinative_v2/CLARA-113-01-RFN/vcf/CLARA-113-01-RFN.hc.g.vcf.gz for better performance
+[PB Info 2026-Mar-02 15:07:42] ProgressMeter -	Current-Locus	Elapsed-Minutes
+[PB Info 2026-Mar-02 15:07:43] ProgressMeter -	chr4:78515721	0.0
+[PB Info 2026-Mar-02 15:07:44] ProgressMeter -	chr8:142996546	0.0
+[PB Info 2026-Mar-02 15:07:45] ProgressMeter -	chr14:46690805	0.1
+[PB Info 2026-Mar-02 15:07:46] ProgressMeter -	chr21:39660877	0.1
+[PB Info 2026-Mar-02 15:07:47] genotypeGVCF finished, total time is 5.009 seconds
+[PB Info 2026-Mar-02 15:07:47] ------------------------------------------------------------------------------
+[PB Info 2026-Mar-02 15:07:47] ||        Program:                                      genotypegvcf        ||
+[PB Info 2026-Mar-02 15:07:47] ||        Version:                                           4.5.1-1        ||
+[PB Info 2026-Mar-02 15:07:47] ||        Start Time:                       Mon Mar  2 15:07:42 2026        ||
+[PB Info 2026-Mar-02 15:07:47] ||        End Time:                         Mon Mar  2 15:07:47 2026        ||
+[PB Info 2026-Mar-02 15:07:47] ||        Total Time:                                      5 seconds        ||
+[PB Info 2026-Mar-02 15:07:47] ------------------------------------------------------------------------------

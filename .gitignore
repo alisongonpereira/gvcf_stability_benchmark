@@ -1,0 +1,6 @@
+# Raw data
+input_gvcfs/
+*.g.vcf
+*.g.vcf.gz
+*.vcf
+*.vcf.gz

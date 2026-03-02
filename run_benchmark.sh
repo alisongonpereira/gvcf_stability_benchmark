@@ -93,9 +93,13 @@ validate_environment() {
                     || warn "VALIDATE" "GLnexus   : NOT FOUND — ${GLNEXUS_BIN} (will skip)"
                 ;;
             parabricks)
-                command -v "${PARABRICKS_BIN}" &>/dev/null \
-                    && log "VALIDATE" "Parabricks: found ($(command -v "${PARABRICKS_BIN}"))" \
-                    || warn "VALIDATE" "Parabricks: NOT FOUND — ${PARABRICKS_BIN} (will skip)"
+                if command -v docker >/dev/null 2>&1 && \
+                    docker run --rm --gpus "device=${PARABRICKS_GPU:-0}" "${PARABRICKS_DOCKER_IMAGE:-nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1}" \
+                    which pbrun >/dev/null 2>&1; then
+                    log "VALIDATE" "Parabricks: found (docker image ${PARABRICKS_DOCKER_IMAGE})"
+                else
+                    warn "VALIDATE" "Parabricks: NOT FOUND — docker/pbrun unavailable (will skip)"
+                fi
                 ;;
             gatk)
                 command -v "${GATK_BIN}"       &>/dev/null \

@@ -1,0 +1,739 @@
+[2026-03-02 11:08:36] [START] =================================================================
+[2026-03-02 11:08:36] [START] GVCF Scalability Benchmark
+[2026-03-02 11:08:36] [START] Started : 2026-03-02 11:08:36
+[2026-03-02 11:08:36] [START] Sizes   : 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:08:36] [START] Software: glnexus parabricks gatk
+[2026-03-02 11:08:36] [START] =================================================================
+[2026-03-02 11:08:36] [SETUP] Creating benchmark directory structure...
+[2026-03-02 11:08:36] [SETUP] Directory structure ready.
+[2026-03-02 11:08:36] [VALIDATE] Validating environment...
+[2026-03-02 11:08:36] [VALIDATE] GVCF pool: 100 files in /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs
+[2026-03-02 11:08:36] [VALIDATE] GLnexus   : found (/home/alisongonpereira/miniconda3/bin/glnexus_cli)
+[2026-03-02 11:08:36] [WARN:VALIDATE] Parabricks: NOT FOUND — docker run --rm --gpus "device=0" -v /nfs/theseus:/nfs/theseus -v /home/alisongonpereira:/home/alisongonpereira -w /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1 pbrun (will skip)
+[2026-03-02 11:08:36] [VALIDATE] GATK      : found (/usr/local/bin/gatk)
+[2026-03-02 11:08:36] [VALIDATE] GPU: NVIDIA A100-SXM4-40GB, 40960 MiB
+Unknown
+[2026-03-02 11:08:36] [VALIDATE] bcftools: found
+[2026-03-02 11:08:36] [VALIDATE] bgzip: found
+[2026-03-02 11:08:36] [VALIDATE] tabix: found
+[2026-03-02 11:08:36] [VALIDATE] Python3: Python 3.12.2
+[2026-03-02 11:08:36] [VALIDATE] Validation complete.
+[2026-03-02 11:08:36] [PREP] === Step 1: Dataset Preparation ===
+[2026-03-02 11:08:38] [PREP] Preparation log: /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/preparation.log
+[2026-03-02 11:08:38] [BENCH] === Step 2: glnexus Benchmark ===
+[2026-03-02 11:08:38] [WARN:BENCH] glnexus benchmark finished with errors (check logs).
+[2026-03-02 11:08:38] [BENCH] === Step 2: parabricks Benchmark ===
+[2026-03-02 11:08:38] [WARN:BENCH] parabricks benchmark finished with errors (check logs).
+[2026-03-02 11:08:38] [BENCH] === Step 2: gatk Benchmark ===
+[2026-03-02 11:08:38] [WARN:BENCH] gatk benchmark finished with errors (check logs).
+[2026-03-02 11:08:38] [REPORT] === Step 3: Generating Reports ===
+[2026-03-02 11:13:17] [START] =================================================================
+[2026-03-02 11:13:17] [START] GVCF Scalability Benchmark
+[2026-03-02 11:13:17] [START] Started : 2026-03-02 11:13:17
+[2026-03-02 11:13:17] [START] Sizes   : 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:13:17] [START] Software: glnexus parabricks gatk
+[2026-03-02 11:13:17] [START] =================================================================
+[2026-03-02 11:13:17] [SETUP] Creating benchmark directory structure...
+[2026-03-02 11:13:17] [SETUP] Directory structure ready.
+[2026-03-02 11:13:17] [VALIDATE] Validating environment...
+[2026-03-02 11:13:18] [VALIDATE] GVCF pool: 100 files in /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs
+[2026-03-02 11:13:18] [VALIDATE] GLnexus   : found (/home/alisongonpereira/miniconda3/bin/glnexus_cli)
+[2026-03-02 11:13:18] [WARN:VALIDATE] Parabricks: NOT FOUND — docker run --rm --gpus "device=0" -v /nfs/theseus:/nfs/theseus -v /home/alisongonpereira:/home/alisongonpereira -w /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1 pbrun (will skip)
+[2026-03-02 11:13:18] [VALIDATE] GATK      : found (/usr/local/bin/gatk)
+[2026-03-02 11:13:18] [VALIDATE] GPU: NVIDIA A100-SXM4-40GB, 40960 MiB
+Unknown
+[2026-03-02 11:13:18] [VALIDATE] bcftools: found
+[2026-03-02 11:13:18] [VALIDATE] bgzip: found
+[2026-03-02 11:13:18] [VALIDATE] tabix: found
+[2026-03-02 11:13:18] [VALIDATE] Python3: Python 3.12.2
+[2026-03-02 11:13:18] [VALIDATE] Validation complete.
+[2026-03-02 11:13:18] [PREP] === Step 1: Dataset Preparation ===
+[2026-03-02 11:13:18] [PREP] Preparation log: /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/preparation.log
+[2026-03-02 11:13:18] [BENCH] === Step 2: glnexus Benchmark ===
+[2026-03-02 11:13:18] [WARN:BENCH] glnexus benchmark finished with errors (check logs).
+[2026-03-02 11:13:18] [BENCH] === Step 2: parabricks Benchmark ===
+[2026-03-02 11:13:18] [WARN:BENCH] parabricks benchmark finished with errors (check logs).
+[2026-03-02 11:13:18] [BENCH] === Step 2: gatk Benchmark ===
+[2026-03-02 11:13:18] [WARN:BENCH] gatk benchmark finished with errors (check logs).
+[2026-03-02 11:13:18] [REPORT] === Step 3: Generating Reports ===
+[2026-03-02 11:16:25] [START] =================================================================
+[2026-03-02 11:16:25] [START] GVCF Scalability Benchmark
+[2026-03-02 11:16:25] [START] Started : 2026-03-02 11:16:25
+[2026-03-02 11:16:25] [START] Sizes   : 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:16:25] [START] Software: glnexus parabricks gatk
+[2026-03-02 11:16:25] [START] =================================================================
+[2026-03-02 11:16:25] [SETUP] Creating benchmark directory structure...
+[2026-03-02 11:16:25] [SETUP] Directory structure ready.
+[2026-03-02 11:16:25] [VALIDATE] Validating environment...
+[2026-03-02 11:16:25] [VALIDATE] GVCF pool: 100 files in /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs
+[2026-03-02 11:16:25] [VALIDATE] GLnexus   : found (/home/alisongonpereira/miniconda3/bin/glnexus_cli)
+[2026-03-02 11:16:25] [WARN:VALIDATE] Parabricks: NOT FOUND — docker run --rm --gpus "device=0" -v /nfs/theseus:/nfs/theseus -v /home/alisongonpereira:/home/alisongonpereira -w /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1 pbrun (will skip)
+[2026-03-02 11:16:25] [VALIDATE] GATK      : found (/usr/local/bin/gatk)
+[2026-03-02 11:16:25] [VALIDATE] GPU: NVIDIA A100-SXM4-40GB, 40960 MiB
+[2026-03-02 11:16:25] [VALIDATE] bcftools: found
+[2026-03-02 11:16:25] [VALIDATE] bgzip: found
+[2026-03-02 11:16:25] [VALIDATE] tabix: found
+[2026-03-02 11:16:25] [VALIDATE] Python3: Python 3.12.2
+[2026-03-02 11:16:25] [VALIDATE] Validation complete.
+[2026-03-02 11:16:25] [PREP] === Step 1: Dataset Preparation ===
+[2026-03-02 11:16:25] [PREP] Preparation log: /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/preparation.log
+[2026-03-02 11:16:25] [BENCH] === Step 2: glnexus Benchmark ===
+[2026-03-02 11:16:25] [WARN:BENCH] glnexus benchmark finished with errors (check logs).
+[2026-03-02 11:16:25] [BENCH] === Step 2: parabricks Benchmark ===
+[2026-03-02 11:16:25] [WARN:BENCH] parabricks benchmark finished with errors (check logs).
+[2026-03-02 11:16:25] [BENCH] === Step 2: gatk Benchmark ===
+[2026-03-02 11:16:25] [WARN:BENCH] gatk benchmark finished with errors (check logs).
+[2026-03-02 11:16:25] [REPORT] === Step 3: Generating Reports ===
+[2026-03-02 11:34:01] [START] =================================================================
+[2026-03-02 11:34:01] [START] GVCF Scalability Benchmark
+[2026-03-02 11:34:01] [START] Started : 2026-03-02 11:34:01
+[2026-03-02 11:34:01] [START] Sizes   : 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:34:01] [START] Software: glnexus parabricks gatk
+[2026-03-02 11:34:01] [START] =================================================================
+[2026-03-02 11:34:01] [SETUP] Creating benchmark directory structure...
+[2026-03-02 11:34:01] [SETUP] Directory structure ready.
+[2026-03-02 11:34:01] [VALIDATE] Validating environment...
+[2026-03-02 11:34:01] [VALIDATE] GVCF pool: 100 files in /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs
+[2026-03-02 11:34:01] [VALIDATE] GLnexus   : found (/home/alisongonpereira/miniconda3/bin/glnexus_cli)
+[2026-03-02 11:34:01] [WARN:VALIDATE] Parabricks: NOT FOUND — docker run --rm --gpus "device=0" -v /nfs/theseus:/nfs/theseus -v /home/alisongonpereira:/home/alisongonpereira -w /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1 pbrun (will skip)
+[2026-03-02 11:34:01] [VALIDATE] GATK      : found (/usr/local/bin/gatk)
+[2026-03-02 11:34:01] [VALIDATE] GPU: NVIDIA A100-SXM4-40GB, 40960 MiB
+Unknown
+[2026-03-02 11:34:01] [VALIDATE] bcftools: found
+[2026-03-02 11:34:01] [VALIDATE] bgzip: found
+[2026-03-02 11:34:01] [VALIDATE] tabix: found
+[2026-03-02 11:34:01] [VALIDATE] Python3: Python 3.12.2
+[2026-03-02 11:34:01] [VALIDATE] Validation complete.
+[2026-03-02 11:34:01] [PREP] === Step 1: Dataset Preparation ===
+[2026-03-02 11:34:01] [PREP] Preparation log: /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/preparation.log
+[2026-03-02 11:34:01] [BENCH] === Step 2: glnexus Benchmark ===
+[2026-03-02 11:34:01] [GLNEXUS] ============================================================
+[2026-03-02 11:34:01] [GLNEXUS] GLnexus Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:34:01] [GLNEXUS] ============================================================
+[2026-03-02 11:34:01] [GLNEXUS] Using: /home/alisongonpereira/miniconda3/bin/glnexus_cli
+[2026-03-02 11:34:01] [GLNEXUS] Config preset: DeepVariantWES
+[2026-03-02 11:34:01] [GLNEXUS] [dataset_10] Starting — 10 GVCFs, config=DeepVariantWES
+[2026-03-02 11:34:01] [MONITOR] Resource monitor started (PID=3806755) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_10/monitor.json
+[2026-03-02 11:34:01] [GLNEXUS] [dataset_10] Executing glnexus_cli...
+[2026-03-02 11:36:04] [START] =================================================================
+[2026-03-02 11:36:04] [START] GVCF Scalability Benchmark
+[2026-03-02 11:36:04] [START] Started : 2026-03-02 11:36:04
+[2026-03-02 11:36:04] [START] Sizes   : 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:36:04] [START] Software: glnexus parabricks gatk
+[2026-03-02 11:36:04] [START] =================================================================
+[2026-03-02 11:36:04] [SETUP] Creating benchmark directory structure...
+[2026-03-02 11:36:04] [SETUP] Directory structure ready.
+[2026-03-02 11:36:04] [VALIDATE] Validating environment...
+[2026-03-02 11:36:04] [VALIDATE] GVCF pool: 100 files in /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs
+[2026-03-02 11:36:04] [VALIDATE] GLnexus   : found (/home/alisongonpereira/miniconda3/bin/glnexus_cli)
+[2026-03-02 11:36:04] [WARN:VALIDATE] Parabricks: NOT FOUND — docker run --rm --gpus "device=0" -v /nfs/theseus:/nfs/theseus -v /home/alisongonpereira:/home/alisongonpereira -w /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1 pbrun (will skip)
+[2026-03-02 11:36:04] [VALIDATE] GATK      : found (/usr/local/bin/gatk)
+[2026-03-02 11:36:04] [VALIDATE] GPU: NVIDIA A100-SXM4-40GB, 40960 MiB
+[2026-03-02 11:36:04] [VALIDATE] bcftools: found
+[2026-03-02 11:36:04] [VALIDATE] bgzip: found
+[2026-03-02 11:36:04] [VALIDATE] tabix: found
+[2026-03-02 11:36:04] [VALIDATE] Python3: Python 3.12.2
+[2026-03-02 11:36:04] [VALIDATE] Validation complete.
+[2026-03-02 11:36:04] [PREP] === Step 1: Dataset Preparation ===
+[2026-03-02 11:36:04] [PREP] Preparation log: /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/preparation.log
+[2026-03-02 11:36:04] [BENCH] === Step 2: glnexus Benchmark ===
+[2026-03-02 11:36:04] [GLNEXUS] ============================================================
+[2026-03-02 11:36:04] [GLNEXUS] GLnexus Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:36:04] [GLNEXUS] ============================================================
+[2026-03-02 11:36:04] [GLNEXUS] Using: /home/alisongonpereira/miniconda3/bin/glnexus_cli
+[2026-03-02 11:36:04] [GLNEXUS] Config preset: DeepVariantWES
+[2026-03-02 11:36:04] [GLNEXUS] [dataset_10] Starting — 10 GVCFs, config=DeepVariantWES
+[2026-03-02 11:36:04] [MONITOR] Resource monitor started (PID=3809403) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_10/monitor.json
+[2026-03-02 11:36:04] [GLNEXUS] [dataset_10] Executing glnexus_cli...
+[2026-03-02 11:37:51] [MONITOR] Resource monitor stopped (PID=3809403)
+[2026-03-02 11:37:59] [VALIDATE] Valid VCF with 1734223 variants: output.vcf
+[2026-03-02 11:38:00] [GLNEXUS] [dataset_10] Done — status=success wall_time=104s variants=1734223
+[2026-03-02 11:38:00] [GLNEXUS] [dataset_20] Starting — 20 GVCFs, config=DeepVariantWES
+[2026-03-02 11:38:00] [MONITOR] Resource monitor started (PID=3811589) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_20/monitor.json
+[2026-03-02 11:38:00] [GLNEXUS] [dataset_20] Executing glnexus_cli...
+[2026-03-02 11:40:59] [MONITOR] Resource monitor stopped (PID=3811589)
+[2026-03-02 11:41:23] [VALIDATE] Valid VCF with 3087313 variants: output.vcf
+[2026-03-02 11:41:23] [GLNEXUS] [dataset_20] Done — status=success wall_time=177s variants=3087313
+[2026-03-02 11:41:23] [GLNEXUS] [dataset_30] Starting — 30 GVCFs, config=DeepVariantWES
+[2026-03-02 11:41:23] [MONITOR] Resource monitor started (PID=3814619) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_30/monitor.json
+[2026-03-02 11:41:23] [GLNEXUS] [dataset_30] Executing glnexus_cli...
+[2026-03-02 11:43:13] [START] =================================================================
+[2026-03-02 11:43:13] [START] GVCF Scalability Benchmark
+[2026-03-02 11:43:13] [START] Started : 2026-03-02 11:43:13
+[2026-03-02 11:43:13] [START] Sizes   : 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:43:13] [START] Software: glnexus parabricks gatk
+[2026-03-02 11:43:13] [START] Filter  : --only parabricks
+[2026-03-02 11:43:13] [START] =================================================================
+[2026-03-02 11:43:13] [SETUP] Creating benchmark directory structure...
+[2026-03-02 11:43:13] [SETUP] Directory structure ready.
+[2026-03-02 11:43:13] [VALIDATE] Validating environment...
+[2026-03-02 11:43:13] [VALIDATE] GVCF pool: 100 files in /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs
+[2026-03-02 11:43:13] [VALIDATE] GLnexus   : found (/home/alisongonpereira/miniconda3/bin/glnexus_cli)
+[2026-03-02 11:43:14] [VALIDATE] Parabricks: found (docker image nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1)
+[2026-03-02 11:43:14] [VALIDATE] GATK      : found (/usr/local/bin/gatk)
+[2026-03-02 11:43:14] [VALIDATE] GPU: NVIDIA A100-SXM4-40GB, 40960 MiB
+Unknown
+[2026-03-02 11:43:14] [VALIDATE] bcftools: found
+[2026-03-02 11:43:14] [VALIDATE] bgzip: found
+[2026-03-02 11:43:14] [VALIDATE] tabix: found
+[2026-03-02 11:43:14] [VALIDATE] Python3: Python 3.12.2
+[2026-03-02 11:43:14] [VALIDATE] Validation complete.
+[2026-03-02 11:43:14] [PREP] === Step 1: Dataset Preparation ===
+[2026-03-02 11:43:14] [PREP] Preparation log: /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/preparation.log
+[2026-03-02 11:43:14] [BENCH] === Step 2: parabricks Benchmark ===
+[2026-03-02 11:43:14] [PARABRICKS] ============================================================
+[2026-03-02 11:43:14] [PARABRICKS] Parabricks Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:43:14] [PARABRICKS] ============================================================
+[2026-03-02 11:43:14] [PARABRICKS] Using: /usr/bin/docker
+[2026-03-02 11:43:14] [PARABRICKS] Reference: /home/alisongonpereira/raid/largefiles/hg38_fasta/Homo_sapiens_assembly38.fasta
+[2026-03-02 11:43:14] [PARABRICKS] GPU device: 0
+[2026-03-02 11:43:14] [PARABRICKS] GPU: NVIDIA A100-SXM4-40GB
+[2026-03-02 11:43:14] [PARABRICKS] [dataset_10] Starting — 10 GVCFs
+[2026-03-02 11:43:14] [MONITOR] Resource monitor started (PID=3816924) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_10/monitor.json
+[2026-03-02 11:43:14] [PARABRICKS] [dataset_10] Executing pbrun joint_genotyping...
+[2026-03-02 11:43:14] [WARN:BENCH] parabricks benchmark finished with errors (check logs).
+[2026-03-02 11:43:14] [REPORT] === Step 3: Generating Reports ===
+[2026-03-02 11:45:32] [MONITOR] Resource monitor stopped (PID=3814619)
+[2026-03-02 11:46:16] [VALIDATE] Valid VCF with 4057032 variants: output.vcf
+[2026-03-02 11:46:16] [GLNEXUS] [dataset_30] Done — status=success wall_time=248s variants=4057032
+[2026-03-02 11:46:16] [GLNEXUS] [dataset_40] Starting — 40 GVCFs, config=DeepVariantWES
+[2026-03-02 11:46:16] [MONITOR] Resource monitor started (PID=3819850) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_40/monitor.json
+[2026-03-02 11:46:16] [GLNEXUS] [dataset_40] Executing glnexus_cli...
+[2026-03-02 11:51:42] [MONITOR] Resource monitor stopped (PID=3819850)
+[2026-03-02 11:52:49] [VALIDATE] Valid VCF with 5047488 variants: output.vcf
+[2026-03-02 11:52:50] [GLNEXUS] [dataset_40] Done — status=success wall_time=321s variants=5047488
+[2026-03-02 11:52:50] [GLNEXUS] [dataset_50] Starting — 50 GVCFs, config=DeepVariantWES
+[2026-03-02 11:52:50] [MONITOR] Resource monitor started (PID=3828589) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_50/monitor.json
+[2026-03-02 11:52:50] [GLNEXUS] [dataset_50] Executing glnexus_cli...
+[2026-03-02 11:55:04] [START] =================================================================
+[2026-03-02 11:55:04] [START] GVCF Scalability Benchmark
+[2026-03-02 11:55:04] [START] Started : 2026-03-02 11:55:04
+[2026-03-02 11:55:04] [START] Sizes   : 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:55:04] [START] Software: glnexus parabricks gatk
+[2026-03-02 11:55:04] [START] Filter  : --only parabricks
+[2026-03-02 11:55:04] [START] =================================================================
+[2026-03-02 11:55:04] [SETUP] Creating benchmark directory structure...
+[2026-03-02 11:55:04] [SETUP] Directory structure ready.
+[2026-03-02 11:55:04] [VALIDATE] Validating environment...
+[2026-03-02 11:55:04] [VALIDATE] GVCF pool: 100 files in /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs
+[2026-03-02 11:55:04] [VALIDATE] GLnexus   : found (/home/alisongonpereira/miniconda3/bin/glnexus_cli)
+[2026-03-02 11:55:05] [VALIDATE] Parabricks: found (docker image nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1)
+[2026-03-02 11:55:05] [VALIDATE] GATK      : found (/usr/local/bin/gatk)
+[2026-03-02 11:55:05] [VALIDATE] GPU: NVIDIA A100-SXM4-40GB, 40960 MiB
+Unknown
+[2026-03-02 11:55:05] [VALIDATE] bcftools: found
+[2026-03-02 11:55:05] [VALIDATE] bgzip: found
+[2026-03-02 11:55:05] [VALIDATE] tabix: found
+[2026-03-02 11:55:05] [VALIDATE] Python3: Python 3.12.2
+[2026-03-02 11:55:05] [VALIDATE] Validation complete.
+[2026-03-02 11:55:05] [PREP] === Step 1: Dataset Preparation ===
+[2026-03-02 11:55:05] [PREP] Preparation log: /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/preparation.log
+[2026-03-02 11:55:05] [BENCH] === Step 2: parabricks Benchmark ===
+[2026-03-02 11:55:05] [PARABRICKS] ============================================================
+[2026-03-02 11:55:05] [PARABRICKS] Parabricks Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:55:05] [PARABRICKS] ============================================================
+[2026-03-02 11:55:05] [PARABRICKS] Using: /usr/bin/docker
+[2026-03-02 11:55:05] [PARABRICKS] Reference: /home/alisongonpereira/raid/largefiles/hg38_fasta/Homo_sapiens_assembly38.fasta
+[2026-03-02 11:55:05] [PARABRICKS] GPU device: 0
+[2026-03-02 11:55:05] [PARABRICKS] GPU: NVIDIA A100-SXM4-40GB
+[2026-03-02 11:55:05] [PARABRICKS] [dataset_10] Starting — 10 GVCFs
+[2026-03-02 11:55:05] [MONITOR] Resource monitor started (PID=3831144) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_10/monitor.json
+[2026-03-02 11:55:05] [PARABRICKS] [dataset_10] Executing pbrun joint_genotyping...
+[2026-03-02 11:55:11] [MONITOR] Resource monitor stopped (PID=3831144)
+[2026-03-02 11:55:11] [WARN:PARABRICKS] [dataset_10] exit_code=255 — see /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_10/stderr.log
+[2026-03-02 11:55:11] [PARABRICKS] [dataset_10] Done — status=failed wall_time=1s variants=0
+[2026-03-02 11:55:11] [PARABRICKS] [dataset_20] Starting — 20 GVCFs
+[2026-03-02 11:55:11] [MONITOR] Resource monitor started (PID=3831463) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_20/monitor.json
+[2026-03-02 11:55:11] [PARABRICKS] [dataset_20] Executing pbrun joint_genotyping...
+[2026-03-02 11:58:03] [START] =================================================================
+[2026-03-02 11:58:03] [START] GVCF Scalability Benchmark
+[2026-03-02 11:58:03] [START] Started : 2026-03-02 11:58:03
+[2026-03-02 11:58:03] [START] Sizes   : 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:58:03] [START] Software: glnexus parabricks gatk
+[2026-03-02 11:58:03] [START] Filter  : --only parabricks
+[2026-03-02 11:58:03] [START] =================================================================
+[2026-03-02 11:58:03] [SETUP] Creating benchmark directory structure...
+[2026-03-02 11:58:03] [SETUP] Directory structure ready.
+[2026-03-02 11:58:03] [VALIDATE] Validating environment...
+[2026-03-02 11:58:03] [VALIDATE] GVCF pool: 100 files in /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs
+[2026-03-02 11:58:03] [VALIDATE] GLnexus   : found (/home/alisongonpereira/miniconda3/bin/glnexus_cli)
+[2026-03-02 11:58:04] [VALIDATE] Parabricks: found (docker image nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1)
+[2026-03-02 11:58:04] [VALIDATE] GATK      : found (/usr/local/bin/gatk)
+[2026-03-02 11:58:05] [VALIDATE] GPU: NVIDIA A100-SXM4-40GB, 40960 MiB
+[2026-03-02 11:58:05] [VALIDATE] bcftools: found
+[2026-03-02 11:58:05] [VALIDATE] bgzip: found
+[2026-03-02 11:58:05] [VALIDATE] tabix: found
+[2026-03-02 11:58:05] [VALIDATE] Python3: Python 3.12.2
+[2026-03-02 11:58:05] [VALIDATE] Validation complete.
+[2026-03-02 11:58:05] [PREP] === Step 1: Dataset Preparation ===
+[2026-03-02 11:58:05] [PREP] Preparation log: /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/preparation.log
+[2026-03-02 11:58:05] [BENCH] === Step 2: parabricks Benchmark ===
+[2026-03-02 11:58:05] [PARABRICKS] ============================================================
+[2026-03-02 11:58:05] [PARABRICKS] Parabricks Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 11:58:05] [PARABRICKS] ============================================================
+[2026-03-02 11:58:05] [PARABRICKS] Using: /usr/bin/docker
+[2026-03-02 11:58:05] [PARABRICKS] Reference: /home/alisongonpereira/raid/largefiles/hg38_fasta/Homo_sapiens_assembly38.fasta
+[2026-03-02 11:58:05] [PARABRICKS] GPU device: 0
+[2026-03-02 11:58:05] [PARABRICKS] GPU: NVIDIA A100-SXM4-40GB
+[2026-03-02 11:58:05] [PARABRICKS] [dataset_10] Starting — 10 GVCFs
+[2026-03-02 11:58:05] [MONITOR] Resource monitor started (PID=3836433) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_10/monitor.json
+[2026-03-02 11:58:05] [PARABRICKS] [dataset_10] Executing pbrun joint_genotyping...
+[2026-03-02 11:58:10] [MONITOR] Resource monitor stopped (PID=3836433)
+[2026-03-02 11:58:10] [WARN:PARABRICKS] [dataset_10] exit_code=255 — see /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_10/stderr.log
+[2026-03-02 11:58:10] [PARABRICKS] [dataset_10] Done — status=failed wall_time=1s variants=0
+[2026-03-02 11:58:10] [PARABRICKS] [dataset_20] Starting — 20 GVCFs
+[2026-03-02 11:58:11] [MONITOR] Resource monitor started (PID=3836741) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_20/monitor.json
+[2026-03-02 11:58:11] [PARABRICKS] [dataset_20] Executing pbrun joint_genotyping...
+[2026-03-02 11:59:27] [MONITOR] Resource monitor stopped (PID=3828589)
+[2026-03-02 12:01:05] [VALIDATE] Valid VCF with 6048061 variants: output.vcf
+[2026-03-02 12:01:05] [GLNEXUS] [dataset_50] Done — status=success wall_time=395s variants=6048061
+[2026-03-02 12:01:05] [GLNEXUS] [dataset_60] Starting — 60 GVCFs, config=DeepVariantWES
+[2026-03-02 12:01:05] [MONITOR] Resource monitor started (PID=3840031) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_60/monitor.json
+[2026-03-02 12:01:06] [GLNEXUS] [dataset_60] Executing glnexus_cli...
+[2026-03-02 12:02:35] [START] =================================================================
+[2026-03-02 12:02:35] [START] GVCF Scalability Benchmark
+[2026-03-02 12:02:35] [START] Started : 2026-03-02 12:02:35
+[2026-03-02 12:02:35] [START] Sizes   : 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 12:02:35] [START] Software: glnexus parabricks gatk
+[2026-03-02 12:02:35] [START] Filter  : --only parabricks
+[2026-03-02 12:02:35] [START] =================================================================
+[2026-03-02 12:02:35] [SETUP] Creating benchmark directory structure...
+[2026-03-02 12:02:35] [SETUP] Directory structure ready.
+[2026-03-02 12:02:35] [VALIDATE] Validating environment...
+[2026-03-02 12:02:35] [VALIDATE] GVCF pool: 100 files in /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs
+[2026-03-02 12:02:35] [VALIDATE] GLnexus   : found (/home/alisongonpereira/miniconda3/bin/glnexus_cli)
+[2026-03-02 12:02:36] [VALIDATE] Parabricks: found (docker image nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1)
+[2026-03-02 12:02:36] [VALIDATE] GATK      : found (/usr/local/bin/gatk)
+[2026-03-02 12:02:36] [VALIDATE] GPU: NVIDIA A100-SXM4-40GB, 40960 MiB
+Unknown
+[2026-03-02 12:02:36] [VALIDATE] bcftools: found
+[2026-03-02 12:02:36] [VALIDATE] bgzip: found
+[2026-03-02 12:02:36] [VALIDATE] tabix: found
+[2026-03-02 12:02:36] [VALIDATE] Python3: Python 3.12.2
+[2026-03-02 12:02:36] [VALIDATE] Validation complete.
+[2026-03-02 12:02:36] [PREP] === Step 1: Dataset Preparation ===
+[2026-03-02 12:02:37] [PREP] Preparation log: /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/preparation.log
+[2026-03-02 12:02:37] [BENCH] === Step 2: parabricks Benchmark ===
+[2026-03-02 12:02:37] [PARABRICKS] ============================================================
+[2026-03-02 12:02:37] [PARABRICKS] Parabricks Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 12:02:37] [PARABRICKS] ============================================================
+[2026-03-02 12:02:37] [PARABRICKS] Using: /usr/bin/docker
+[2026-03-02 12:02:37] [PARABRICKS] Reference: /home/alisongonpereira/raid/largefiles/hg38_fasta/Homo_sapiens_assembly38.fasta
+[2026-03-02 12:02:37] [PARABRICKS] GPU device: 0
+[2026-03-02 12:02:37] [PARABRICKS] GPU: NVIDIA A100-SXM4-40GB
+[2026-03-02 12:02:37] [PARABRICKS] [dataset_10] Starting — 10 GVCFs
+[2026-03-02 12:02:37] [MONITOR] Resource monitor started (PID=3842134) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_10/monitor.json
+[2026-03-02 12:02:37] [PARABRICKS] [dataset_10] Executing pbrun joint_genotyping...
+[2026-03-02 12:02:42] [MONITOR] Resource monitor stopped (PID=3842134)
+[2026-03-02 12:02:43] [VALIDATE] Valid VCF with 287497 variants: output.vcf
+[2026-03-02 12:02:43] [PARABRICKS] [dataset_10] Done — status=success wall_time=4s variants=287497
+[2026-03-02 12:02:43] [PARABRICKS] [dataset_20] Starting — 20 GVCFs
+[2026-03-02 12:02:43] [MONITOR] Resource monitor started (PID=3844091) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_20/monitor.json
+[2026-03-02 12:02:43] [PARABRICKS] [dataset_20] Executing pbrun joint_genotyping...
+[2026-03-02 12:02:48] [MONITOR] Resource monitor stopped (PID=3844091)
+[2026-03-02 12:02:49] [VALIDATE] Valid VCF with 287497 variants: output.vcf
+[2026-03-02 12:02:49] [PARABRICKS] [dataset_20] Done — status=success wall_time=5s variants=287497
+[2026-03-02 12:02:49] [PARABRICKS] [dataset_30] Starting — 30 GVCFs
+[2026-03-02 12:02:49] [MONITOR] Resource monitor started (PID=3844361) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_30/monitor.json
+[2026-03-02 12:02:49] [PARABRICKS] [dataset_30] Executing pbrun joint_genotyping...
+[2026-03-02 12:02:54] [MONITOR] Resource monitor stopped (PID=3844361)
+[2026-03-02 12:02:55] [VALIDATE] Valid VCF with 287312 variants: output.vcf
+[2026-03-02 12:02:55] [PARABRICKS] [dataset_30] Done — status=success wall_time=5s variants=287312
+[2026-03-02 12:02:55] [PARABRICKS] [dataset_40] Starting — 40 GVCFs
+[2026-03-02 12:02:56] [MONITOR] Resource monitor started (PID=3844917) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_40/monitor.json
+[2026-03-02 12:02:56] [PARABRICKS] [dataset_40] Executing pbrun joint_genotyping...
+[2026-03-02 12:03:06] [MONITOR] Resource monitor stopped (PID=3844917)
+[2026-03-02 12:03:07] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:03:07] [PARABRICKS] [dataset_40] Done — status=success wall_time=5s variants=338388
+[2026-03-02 12:03:07] [PARABRICKS] [dataset_50] Starting — 50 GVCFs
+[2026-03-02 12:03:07] [MONITOR] Resource monitor started (PID=3845486) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_50/monitor.json
+[2026-03-02 12:03:07] [PARABRICKS] [dataset_50] Executing pbrun joint_genotyping...
+[2026-03-02 12:03:17] [MONITOR] Resource monitor stopped (PID=3845486)
+[2026-03-02 12:03:19] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:03:19] [PARABRICKS] [dataset_50] Done — status=success wall_time=6s variants=338388
+[2026-03-02 12:03:19] [PARABRICKS] [dataset_60] Starting — 60 GVCFs
+[2026-03-02 12:03:19] [MONITOR] Resource monitor started (PID=3846198) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_60/monitor.json
+[2026-03-02 12:03:19] [PARABRICKS] [dataset_60] Executing pbrun joint_genotyping...
+[2026-03-02 12:03:29] [MONITOR] Resource monitor stopped (PID=3846198)
+[2026-03-02 12:03:30] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:03:30] [PARABRICKS] [dataset_60] Done — status=success wall_time=6s variants=338388
+[2026-03-02 12:03:30] [PARABRICKS] [dataset_70] Starting — 70 GVCFs
+[2026-03-02 12:03:30] [MONITOR] Resource monitor started (PID=3846860) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_70/monitor.json
+[2026-03-02 12:03:30] [PARABRICKS] [dataset_70] Executing pbrun joint_genotyping...
+[2026-03-02 12:03:41] [MONITOR] Resource monitor stopped (PID=3846860)
+[2026-03-02 12:03:42] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:03:42] [PARABRICKS] [dataset_70] Done — status=success wall_time=6s variants=338388
+[2026-03-02 12:03:42] [PARABRICKS] [dataset_80] Starting — 80 GVCFs
+[2026-03-02 12:03:42] [MONITOR] Resource monitor started (PID=3847464) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_80/monitor.json
+[2026-03-02 12:03:42] [PARABRICKS] [dataset_80] Executing pbrun joint_genotyping...
+[2026-03-02 12:03:52] [MONITOR] Resource monitor stopped (PID=3847464)
+[2026-03-02 12:03:54] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:03:54] [PARABRICKS] [dataset_80] Done — status=success wall_time=6s variants=338388
+[2026-03-02 12:03:54] [PARABRICKS] [dataset_90] Starting — 90 GVCFs
+[2026-03-02 12:03:54] [MONITOR] Resource monitor started (PID=3848078) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_90/monitor.json
+[2026-03-02 12:03:54] [PARABRICKS] [dataset_90] Executing pbrun joint_genotyping...
+[2026-03-02 12:04:05] [MONITOR] Resource monitor stopped (PID=3848078)
+[2026-03-02 12:04:06] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:04:06] [PARABRICKS] [dataset_90] Done — status=success wall_time=8s variants=338388
+[2026-03-02 12:04:06] [PARABRICKS] [dataset_100] Starting — 100 GVCFs
+[2026-03-02 12:04:06] [MONITOR] Resource monitor started (PID=3848771) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_100/monitor.json
+[2026-03-02 12:04:07] [PARABRICKS] [dataset_100] Executing pbrun joint_genotyping...
+[2026-03-02 12:04:17] [MONITOR] Resource monitor stopped (PID=3848771)
+[2026-03-02 12:04:18] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:04:18] [PARABRICKS] [dataset_100] Done — status=success wall_time=8s variants=338388
+[2026-03-02 12:04:18] [PARABRICKS] Parabricks benchmark complete.
+[2026-03-02 12:04:18] [BENCH] parabricks benchmark completed.
+[2026-03-02 12:04:18] [REPORT] === Step 3: Generating Reports ===
+[2026-03-02 12:04:29] [START] =================================================================
+[2026-03-02 12:04:30] [START] GVCF Scalability Benchmark
+[2026-03-02 12:04:30] [START] Started : 2026-03-02 12:04:29
+[2026-03-02 12:04:30] [START] Sizes   : 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 12:04:30] [START] Software: glnexus parabricks gatk
+[2026-03-02 12:04:30] [START] =================================================================
+[2026-03-02 12:04:30] [SETUP] Creating benchmark directory structure...
+[2026-03-02 12:04:30] [SETUP] Directory structure ready.
+[2026-03-02 12:04:30] [VALIDATE] Validating environment...
+[2026-03-02 12:04:30] [VALIDATE] GVCF pool: 100 files in /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs
+[2026-03-02 12:04:30] [VALIDATE] GLnexus   : found (/home/alisongonpereira/miniconda3/bin/glnexus_cli)
+[2026-03-02 12:04:31] [VALIDATE] Parabricks: found (docker image nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1)
+[2026-03-02 12:04:31] [VALIDATE] GATK      : found (/usr/local/bin/gatk)
+[2026-03-02 12:04:31] [VALIDATE] GPU: NVIDIA A100-SXM4-40GB, 40960 MiB
+Unknown
+[2026-03-02 12:04:31] [VALIDATE] bcftools: found
+[2026-03-02 12:04:31] [VALIDATE] bgzip: found
+[2026-03-02 12:04:31] [VALIDATE] tabix: found
+[2026-03-02 12:04:31] [VALIDATE] Python3: Python 3.12.2
+[2026-03-02 12:04:31] [VALIDATE] Validation complete.
+[2026-03-02 12:04:31] [PREP] === Step 1: Dataset Preparation ===
+[2026-03-02 12:04:31] [PREP] Preparation log: /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/preparation.log
+[2026-03-02 12:04:31] [BENCH] === Step 2: glnexus Benchmark ===
+[2026-03-02 12:04:31] [GLNEXUS] ============================================================
+[2026-03-02 12:04:31] [GLNEXUS] GLnexus Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 12:04:31] [GLNEXUS] ============================================================
+[2026-03-02 12:04:31] [GLNEXUS] Using: /home/alisongonpereira/miniconda3/bin/glnexus_cli
+[2026-03-02 12:04:31] [GLNEXUS] Config preset: DeepVariantWES
+[2026-03-02 12:04:31] [GLNEXUS] [dataset_10] Already completed — skipping (delete .done to rerun)
+[2026-03-02 12:04:31] [GLNEXUS] [dataset_20] Already completed — skipping (delete .done to rerun)
+[2026-03-02 12:04:31] [GLNEXUS] [dataset_30] Already completed — skipping (delete .done to rerun)
+[2026-03-02 12:04:31] [GLNEXUS] [dataset_40] Already completed — skipping (delete .done to rerun)
+[2026-03-02 12:04:31] [GLNEXUS] [dataset_50] Already completed — skipping (delete .done to rerun)
+[2026-03-02 12:04:31] [GLNEXUS] [dataset_60] Starting — 60 GVCFs, config=DeepVariantWES
+[2026-03-02 12:04:31] [MONITOR] Resource monitor started (PID=3849984) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_60/monitor.json
+[2026-03-02 12:04:32] [GLNEXUS] [dataset_60] Executing glnexus_cli...
+[2026-03-02 12:04:49] [START] =================================================================
+[2026-03-02 12:04:49] [START] GVCF Scalability Benchmark
+[2026-03-02 12:04:49] [START] Started : 2026-03-02 12:04:49
+[2026-03-02 12:04:49] [START] Sizes   : 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 12:04:49] [START] Software: glnexus parabricks gatk
+[2026-03-02 12:04:49] [START] Filter  : --only parabricks
+[2026-03-02 12:04:49] [START] =================================================================
+[2026-03-02 12:04:49] [SETUP] Creating benchmark directory structure...
+[2026-03-02 12:04:49] [SETUP] Directory structure ready.
+[2026-03-02 12:04:49] [VALIDATE] Validating environment...
+[2026-03-02 12:04:49] [VALIDATE] GVCF pool: 100 files in /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs
+[2026-03-02 12:04:49] [VALIDATE] GLnexus   : found (/home/alisongonpereira/miniconda3/bin/glnexus_cli)
+[2026-03-02 12:04:52] [VALIDATE] Parabricks: found (docker image nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1)
+[2026-03-02 12:04:52] [VALIDATE] GATK      : found (/usr/local/bin/gatk)
+[2026-03-02 12:04:52] [VALIDATE] GPU: NVIDIA A100-SXM4-40GB, 40960 MiB
+Unknown
+[2026-03-02 12:04:52] [VALIDATE] bcftools: found
+[2026-03-02 12:04:52] [VALIDATE] bgzip: found
+[2026-03-02 12:04:52] [VALIDATE] tabix: found
+[2026-03-02 12:04:52] [VALIDATE] Python3: Python 3.12.2
+[2026-03-02 12:04:52] [VALIDATE] Validation complete.
+[2026-03-02 12:04:52] [PREP] === Step 1: Dataset Preparation ===
+[2026-03-02 12:04:52] [PREP] Preparation log: /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/preparation.log
+[2026-03-02 12:04:52] [BENCH] === Step 2: parabricks Benchmark ===
+[2026-03-02 12:04:52] [PARABRICKS] ============================================================
+[2026-03-02 12:04:52] [PARABRICKS] Parabricks Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 12:04:52] [PARABRICKS] ============================================================
+[2026-03-02 12:04:52] [PARABRICKS] Using: /usr/bin/docker
+[2026-03-02 12:04:52] [PARABRICKS] Reference: /home/alisongonpereira/raid/largefiles/hg38_fasta/Homo_sapiens_assembly38.fasta
+[2026-03-02 12:04:52] [PARABRICKS] GPU device: 0
+[2026-03-02 12:04:53] [PARABRICKS] GPU: NVIDIA A100-SXM4-40GB
+[2026-03-02 12:04:53] [PARABRICKS] [dataset_10] Already completed — skipping
+[2026-03-02 12:04:53] [PARABRICKS] [dataset_20] Already completed — skipping
+[2026-03-02 12:04:53] [PARABRICKS] [dataset_30] Already completed — skipping
+[2026-03-02 12:04:53] [PARABRICKS] [dataset_40] Already completed — skipping
+[2026-03-02 12:04:53] [PARABRICKS] [dataset_50] Already completed — skipping
+[2026-03-02 12:04:53] [PARABRICKS] [dataset_60] Already completed — skipping
+[2026-03-02 12:04:53] [PARABRICKS] [dataset_70] Already completed — skipping
+[2026-03-02 12:04:53] [PARABRICKS] [dataset_80] Already completed — skipping
+[2026-03-02 12:04:53] [PARABRICKS] [dataset_90] Already completed — skipping
+[2026-03-02 12:04:53] [PARABRICKS] [dataset_100] Already completed — skipping
+[2026-03-02 12:04:53] [PARABRICKS] Parabricks benchmark complete.
+[2026-03-02 12:04:53] [BENCH] parabricks benchmark completed.
+[2026-03-02 12:04:53] [REPORT] === Step 3: Generating Reports ===
+[2026-03-02 12:06:41] [START] =================================================================
+[2026-03-02 12:06:41] [START] GVCF Scalability Benchmark
+[2026-03-02 12:06:41] [START] Started : 2026-03-02 12:06:41
+[2026-03-02 12:06:41] [START] Sizes   : 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 12:06:41] [START] Software: glnexus parabricks gatk
+[2026-03-02 12:06:41] [START] Filter  : --only parabricks
+[2026-03-02 12:06:41] [START] =================================================================
+[2026-03-02 12:06:41] [SETUP] Creating benchmark directory structure...
+[2026-03-02 12:06:41] [SETUP] Directory structure ready.
+[2026-03-02 12:06:41] [VALIDATE] Validating environment...
+[2026-03-02 12:06:41] [VALIDATE] GVCF pool: 100 files in /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs
+[2026-03-02 12:06:41] [VALIDATE] GLnexus   : found (/home/alisongonpereira/miniconda3/bin/glnexus_cli)
+[2026-03-02 12:06:42] [VALIDATE] Parabricks: found (docker image nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1)
+[2026-03-02 12:06:42] [VALIDATE] GATK      : found (/usr/local/bin/gatk)
+[2026-03-02 12:06:42] [VALIDATE] GPU: NVIDIA A100-SXM4-40GB, 40960 MiB
+Unknown
+[2026-03-02 12:06:42] [VALIDATE] bcftools: found
+[2026-03-02 12:06:42] [VALIDATE] bgzip: found
+[2026-03-02 12:06:42] [VALIDATE] tabix: found
+[2026-03-02 12:06:42] [VALIDATE] Python3: Python 3.12.2
+[2026-03-02 12:06:42] [VALIDATE] Validation complete.
+[2026-03-02 12:06:42] [PREP] === Step 1: Dataset Preparation ===
+[2026-03-02 12:06:42] [PREP] Preparation log: /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/preparation.log
+[2026-03-02 12:06:42] [BENCH] === Step 2: parabricks Benchmark ===
+[2026-03-02 12:06:42] [PARABRICKS] ============================================================
+[2026-03-02 12:06:42] [PARABRICKS] Parabricks Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 12:06:42] [PARABRICKS] ============================================================
+[2026-03-02 12:06:42] [PARABRICKS] Using: /usr/bin/docker
+[2026-03-02 12:06:42] [PARABRICKS] Reference: /home/alisongonpereira/raid/largefiles/hg38_fasta/Homo_sapiens_assembly38.fasta
+[2026-03-02 12:06:42] [PARABRICKS] GPU device: 0
+[2026-03-02 12:06:42] [PARABRICKS] GPU: NVIDIA A100-SXM4-40GB
+[2026-03-02 12:06:42] [PARABRICKS] [dataset_10] Starting — 10 GVCFs
+[2026-03-02 12:06:43] [MONITOR] Resource monitor started (PID=3853657) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_10/monitor.json
+[2026-03-02 12:06:43] [PARABRICKS] [dataset_10] Executing pbrun joint_genotyping...
+[2026-03-02 12:06:53] [MONITOR] Resource monitor stopped (PID=3853657)
+[2026-03-02 12:06:54] [VALIDATE] Valid VCF with 287497 variants: output.vcf
+[2026-03-02 12:06:54] [PARABRICKS] [dataset_10] Done — status=success wall_time=6s variants=287497
+[2026-03-02 12:06:55] [PARABRICKS] [dataset_20] Starting — 20 GVCFs
+[2026-03-02 12:06:55] [MONITOR] Resource monitor started (PID=3853933) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_20/monitor.json
+[2026-03-02 12:06:55] [PARABRICKS] [dataset_20] Executing pbrun joint_genotyping...
+[2026-03-02 12:07:05] [MONITOR] Resource monitor stopped (PID=3853933)
+[2026-03-02 12:07:06] [VALIDATE] Valid VCF with 287497 variants: output.vcf
+[2026-03-02 12:07:06] [PARABRICKS] [dataset_20] Done — status=success wall_time=7s variants=287497
+[2026-03-02 12:07:06] [PARABRICKS] [dataset_30] Starting — 30 GVCFs
+[2026-03-02 12:07:07] [MONITOR] Resource monitor started (PID=3854568) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_30/monitor.json
+[2026-03-02 12:07:07] [PARABRICKS] [dataset_30] Executing pbrun joint_genotyping...
+[2026-03-02 12:07:17] [MONITOR] Resource monitor stopped (PID=3854568)
+[2026-03-02 12:07:19] [VALIDATE] Valid VCF with 287312 variants: output.vcf
+[2026-03-02 12:07:19] [PARABRICKS] [dataset_30] Done — status=success wall_time=8s variants=287312
+[2026-03-02 12:07:19] [PARABRICKS] [dataset_40] Starting — 40 GVCFs
+[2026-03-02 12:07:19] [MONITOR] Resource monitor started (PID=3855237) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_40/monitor.json
+[2026-03-02 12:07:19] [PARABRICKS] [dataset_40] Executing pbrun joint_genotyping...
+[2026-03-02 12:07:29] [MONITOR] Resource monitor stopped (PID=3855237)
+[2026-03-02 12:07:31] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:07:31] [PARABRICKS] [dataset_40] Done — status=success wall_time=8s variants=338388
+[2026-03-02 12:07:31] [PARABRICKS] [dataset_50] Starting — 50 GVCFs
+[2026-03-02 12:07:31] [MONITOR] Resource monitor started (PID=3855793) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_50/monitor.json
+[2026-03-02 12:07:31] [PARABRICKS] [dataset_50] Executing pbrun joint_genotyping...
+[2026-03-02 12:07:41] [PARABRICKS] ============================================================
+[2026-03-02 12:07:41] [PARABRICKS] Parabricks Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 12:07:41] [PARABRICKS] ============================================================
+[2026-03-02 12:07:41] [PARABRICKS] Using: /usr/bin/docker
+[2026-03-02 12:07:41] [PARABRICKS] Reference: /home/alisongonpereira/raid/largefiles/hg38_fasta/Homo_sapiens_assembly38.fasta
+[2026-03-02 12:07:41] [PARABRICKS] GPU device: 0
+[2026-03-02 12:07:41] [PARABRICKS] GPU: NVIDIA A100-SXM4-40GB
+[2026-03-02 12:07:41] [PARABRICKS] [dataset_10] Starting — 10 GVCFs
+[2026-03-02 12:07:42] [MONITOR] Resource monitor started (PID=3856393) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_10/monitor.json
+[2026-03-02 12:07:42] [PARABRICKS] [dataset_10] Executing pbrun joint_genotyping...
+[2026-03-02 12:07:52] [MONITOR] Resource monitor stopped (PID=3856393)
+[2026-03-02 12:07:53] [VALIDATE] Valid VCF with 287497 variants: output.vcf
+[2026-03-02 12:07:53] [PARABRICKS] [dataset_10] Done — status=success wall_time=8s variants=287497
+[2026-03-02 12:07:53] [PARABRICKS] [dataset_20] Starting — 20 GVCFs
+[2026-03-02 12:07:53] [MONITOR] Resource monitor started (PID=3856950) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_20/monitor.json
+[2026-03-02 12:07:53] [PARABRICKS] [dataset_20] Executing pbrun joint_genotyping...
+[2026-03-02 12:08:04] [MONITOR] Resource monitor stopped (PID=3856950)
+[2026-03-02 12:08:05] [VALIDATE] Valid VCF with 287497 variants: output.vcf
+[2026-03-02 12:08:05] [PARABRICKS] [dataset_20] Done — status=success wall_time=8s variants=287497
+[2026-03-02 12:08:05] [PARABRICKS] [dataset_30] Starting — 30 GVCFs
+[2026-03-02 12:08:06] [MONITOR] Resource monitor started (PID=3857507) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_30/monitor.json
+[2026-03-02 12:08:06] [PARABRICKS] [dataset_30] Executing pbrun joint_genotyping...
+[2026-03-02 12:08:16] [MONITOR] Resource monitor stopped (PID=3857507)
+[2026-03-02 12:08:17] [VALIDATE] Valid VCF with 287312 variants: output.vcf
+[2026-03-02 12:08:18] [PARABRICKS] [dataset_30] Done — status=success wall_time=6s variants=287312
+[2026-03-02 12:08:18] [PARABRICKS] [dataset_40] Starting — 40 GVCFs
+[2026-03-02 12:08:18] [MONITOR] Resource monitor started (PID=3858179) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_40/monitor.json
+[2026-03-02 12:08:18] [PARABRICKS] [dataset_40] Executing pbrun joint_genotyping...
+[2026-03-02 12:08:29] [MONITOR] Resource monitor stopped (PID=3858179)
+[2026-03-02 12:08:31] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:08:31] [PARABRICKS] [dataset_40] Done — status=success wall_time=7s variants=338388
+[2026-03-02 12:08:31] [PARABRICKS] [dataset_50] Starting — 50 GVCFs
+[2026-03-02 12:08:31] [MONITOR] Resource monitor started (PID=3858782) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_50/monitor.json
+[2026-03-02 12:08:31] [PARABRICKS] [dataset_50] Executing pbrun joint_genotyping...
+[2026-03-02 12:08:41] [MONITOR] Resource monitor stopped (PID=3858782)
+[2026-03-02 12:08:43] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:08:43] [PARABRICKS] [dataset_50] Done — status=success wall_time=8s variants=338388
+[2026-03-02 12:08:43] [PARABRICKS] [dataset_60] Starting — 60 GVCFs
+[2026-03-02 12:08:43] [MONITOR] Resource monitor started (PID=3859397) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_60/monitor.json
+[2026-03-02 12:08:43] [PARABRICKS] [dataset_60] Executing pbrun joint_genotyping...
+[2026-03-02 12:08:54] [MONITOR] Resource monitor stopped (PID=3859397)
+[2026-03-02 12:08:56] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:08:56] [PARABRICKS] [dataset_60] Done — status=success wall_time=9s variants=338388
+[2026-03-02 12:08:56] [PARABRICKS] [dataset_70] Starting — 70 GVCFs
+[2026-03-02 12:08:56] [MONITOR] Resource monitor started (PID=3860044) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_70/monitor.json
+[2026-03-02 12:08:56] [PARABRICKS] [dataset_70] Executing pbrun joint_genotyping...
+[2026-03-02 12:09:06] [MONITOR] Resource monitor stopped (PID=3860044)
+[2026-03-02 12:09:10] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:09:10] [PARABRICKS] [dataset_70] Done — status=success wall_time=7s variants=338388
+[2026-03-02 12:09:10] [PARABRICKS] [dataset_80] Starting — 80 GVCFs
+[2026-03-02 12:09:10] [MONITOR] Resource monitor started (PID=3860702) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_80/monitor.json
+[2026-03-02 12:09:10] [PARABRICKS] [dataset_80] Executing pbrun joint_genotyping...
+[2026-03-02 12:09:21] [MONITOR] Resource monitor stopped (PID=3860702)
+[2026-03-02 12:09:23] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:09:23] [PARABRICKS] [dataset_80] Done — status=success wall_time=8s variants=338388
+[2026-03-02 12:09:23] [PARABRICKS] [dataset_90] Starting — 90 GVCFs
+[2026-03-02 12:09:23] [MONITOR] Resource monitor started (PID=3861369) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_90/monitor.json
+[2026-03-02 12:09:23] [PARABRICKS] [dataset_90] Executing pbrun joint_genotyping...
+[2026-03-02 12:09:33] [MONITOR] Resource monitor stopped (PID=3861369)
+[2026-03-02 12:09:35] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:09:35] [PARABRICKS] [dataset_90] Done — status=success wall_time=8s variants=338388
+[2026-03-02 12:09:35] [PARABRICKS] [dataset_100] Starting — 100 GVCFs
+[2026-03-02 12:09:36] [MONITOR] Resource monitor started (PID=3862038) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/parabricks/dataset_100/monitor.json
+[2026-03-02 12:09:36] [PARABRICKS] [dataset_100] Executing pbrun joint_genotyping...
+[2026-03-02 12:09:46] [MONITOR] Resource monitor stopped (PID=3862038)
+[2026-03-02 12:09:50] [VALIDATE] Valid VCF with 338388 variants: output.vcf
+[2026-03-02 12:09:50] [PARABRICKS] [dataset_100] Done — status=success wall_time=8s variants=338388
+[2026-03-02 12:09:50] [PARABRICKS] Parabricks benchmark complete.
+[2026-03-02 12:10:11] [MONITOR] Resource monitor stopped (PID=3840031)
+[2026-03-02 12:12:23] [VALIDATE] Valid VCF with 6890455 variants: output.vcf
+[2026-03-02 12:12:23] [GLNEXUS] [dataset_60] Done — status=success wall_time=544s variants=6890455
+[2026-03-02 12:12:24] [GLNEXUS] [dataset_70] Starting — 70 GVCFs, config=DeepVariantWES
+[2026-03-02 12:12:24] [MONITOR] Resource monitor started (PID=3866284) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_70/monitor.json
+[2026-03-02 12:12:24] [GLNEXUS] [dataset_70] Executing glnexus_cli...
+[2026-03-02 12:22:32] [MONITOR] Resource monitor stopped (PID=3866284)
+[2026-03-02 12:25:16] [VALIDATE] Valid VCF with 7461015 variants: output.vcf
+[2026-03-02 12:25:16] [GLNEXUS] [dataset_70] Done — status=success wall_time=605s variants=7461015
+[2026-03-02 12:25:16] [GLNEXUS] [dataset_80] Starting — 80 GVCFs, config=DeepVariantWES
+[2026-03-02 12:25:16] [MONITOR] Resource monitor started (PID=3876630) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_80/monitor.json
+[2026-03-02 12:25:17] [GLNEXUS] [dataset_80] Executing glnexus_cli...
+[2026-03-02 12:35:20] [MONITOR] Resource monitor stopped (PID=3876630)
+[2026-03-02 12:38:50] [VALIDATE] Valid VCF with 8436228 variants: output.vcf
+[2026-03-02 12:38:50] [GLNEXUS] [dataset_80] Done — status=success wall_time=599s variants=8436228
+[2026-03-02 12:38:50] [GLNEXUS] [dataset_90] Starting — 90 GVCFs, config=DeepVariantWES
+[2026-03-02 12:38:51] [MONITOR] Resource monitor started (PID=3887402) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_90/monitor.json
+[2026-03-02 12:38:51] [GLNEXUS] [dataset_90] Executing glnexus_cli...
+[2026-03-02 12:49:49] [MONITOR] Resource monitor stopped (PID=3887402)
+[2026-03-02 12:54:04] [VALIDATE] Valid VCF with 9197941 variants: output.vcf
+[2026-03-02 12:54:04] [GLNEXUS] [dataset_90] Done — status=success wall_time=653s variants=9197941
+[2026-03-02 12:54:04] [GLNEXUS] [dataset_100] Starting — 100 GVCFs, config=DeepVariantWES
+[2026-03-02 12:54:05] [MONITOR] Resource monitor started (PID=3899265) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/glnexus/dataset_100/monitor.json
+[2026-03-02 12:54:05] [GLNEXUS] [dataset_100] Executing glnexus_cli...
+[2026-03-02 13:06:00] [MONITOR] Resource monitor stopped (PID=3899265)
+[2026-03-02 13:11:26] [VALIDATE] Valid VCF with 10030297 variants: output.vcf
+[2026-03-02 13:11:26] [GLNEXUS] [dataset_100] Done — status=success wall_time=712s variants=10030297
+[2026-03-02 13:11:26] [GLNEXUS] GLnexus benchmark complete.
+[2026-03-02 13:11:26] [BENCH] glnexus benchmark completed.
+[2026-03-02 13:11:26] [BENCH] === Step 2: parabricks Benchmark ===
+[2026-03-02 13:11:26] [PARABRICKS] ============================================================
+[2026-03-02 13:11:26] [PARABRICKS] Parabricks Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 13:11:26] [PARABRICKS] ============================================================
+[2026-03-02 13:11:26] [PARABRICKS] Using: /usr/bin/docker
+[2026-03-02 13:11:26] [PARABRICKS] Reference: /home/alisongonpereira/raid/largefiles/hg38_fasta/Homo_sapiens_assembly38.fasta
+[2026-03-02 13:11:26] [PARABRICKS] GPU device: 0
+[2026-03-02 13:11:26] [PARABRICKS] GPU: NVIDIA A100-SXM4-40GB
+[2026-03-02 13:11:26] [PARABRICKS] [dataset_10] Already completed — skipping
+[2026-03-02 13:11:26] [PARABRICKS] [dataset_20] Already completed — skipping
+[2026-03-02 13:11:26] [PARABRICKS] [dataset_30] Already completed — skipping
+[2026-03-02 13:11:26] [PARABRICKS] [dataset_40] Already completed — skipping
+[2026-03-02 13:11:26] [PARABRICKS] [dataset_50] Already completed — skipping
+[2026-03-02 13:11:26] [PARABRICKS] [dataset_60] Already completed — skipping
+[2026-03-02 13:11:26] [PARABRICKS] [dataset_70] Already completed — skipping
+[2026-03-02 13:11:26] [PARABRICKS] [dataset_80] Already completed — skipping
+[2026-03-02 13:11:26] [PARABRICKS] [dataset_90] Already completed — skipping
+[2026-03-02 13:11:26] [PARABRICKS] [dataset_100] Already completed — skipping
+[2026-03-02 13:11:26] [PARABRICKS] Parabricks benchmark complete.
+[2026-03-02 13:11:26] [BENCH] parabricks benchmark completed.
+[2026-03-02 13:11:26] [BENCH] === Step 2: gatk Benchmark ===
+[2026-03-02 13:11:26] [GATK] ============================================================
+[2026-03-02 13:11:26] [GATK] GATK Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 13:11:26] [GATK] ============================================================
+[2026-03-02 13:11:26] [GATK] Using: /usr/local/bin/gatk
+[2026-03-02 13:11:26] [GATK] Reference: /home/alisongonpereira/raid/largefiles/hg38_fasta/Homo_sapiens_assembly38.fasta
+[2026-03-02 13:11:26] [GATK] Java opts: -Xmx160g -XX:+UseParallelGC
+[2026-03-02 13:11:26] [GATK] [dataset_10] Starting — 10 GVCFs
+[2026-03-02 13:11:26] [MONITOR] Resource monitor started (PID=3912557) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_10/monitor.json
+[2026-03-02 13:11:26] [GATK] [dataset_10] Step A: CombineGVCFs...
+[2026-03-02 13:11:29] [WARN:GATK] [dataset_10] CombineGVCFs failed (exit_code=245)
+[2026-03-02 13:11:31] [MONITOR] Resource monitor stopped (PID=3912557)
+[2026-03-02 13:11:31] [WARN:GATK] [dataset_10] exit_code=245 — see /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_10/stderr.log
+[2026-03-02 13:11:31] [GATK] [dataset_10] Done — status=failed wall_time=3s variants=0
+[2026-03-02 13:11:31] [GATK] [dataset_20] Starting — 20 GVCFs
+[2026-03-02 13:11:32] [MONITOR] Resource monitor started (PID=3912694) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_20/monitor.json
+[2026-03-02 13:11:32] [GATK] [dataset_20] Step A: CombineGVCFs...
+[2026-03-02 13:11:33] [WARN:GATK] [dataset_20] CombineGVCFs failed (exit_code=245)
+[2026-03-02 13:11:37] [MONITOR] Resource monitor stopped (PID=3912694)
+[2026-03-02 13:11:37] [WARN:GATK] [dataset_20] exit_code=245 — see /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_20/stderr.log
+[2026-03-02 13:11:37] [GATK] [dataset_20] Done — status=failed wall_time=1s variants=0
+[2026-03-02 13:11:37] [GATK] [dataset_30] Starting — 30 GVCFs
+[2026-03-02 13:11:37] [MONITOR] Resource monitor started (PID=3912796) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_30/monitor.json
+[2026-03-02 13:11:37] [GATK] [dataset_30] Step A: CombineGVCFs...
+[2026-03-02 13:11:38] [WARN:GATK] [dataset_30] CombineGVCFs failed (exit_code=245)
+[2026-03-02 13:11:42] [MONITOR] Resource monitor stopped (PID=3912796)
+[2026-03-02 13:11:42] [WARN:GATK] [dataset_30] exit_code=245 — see /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_30/stderr.log
+[2026-03-02 13:11:42] [GATK] [dataset_30] Done — status=failed wall_time=1s variants=0
+[2026-03-02 13:11:42] [GATK] [dataset_40] Starting — 40 GVCFs
+[2026-03-02 13:11:42] [MONITOR] Resource monitor started (PID=3912955) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_40/monitor.json
+[2026-03-02 13:11:42] [GATK] [dataset_40] Step A: CombineGVCFs...
+[2026-03-02 13:11:43] [WARN:GATK] [dataset_40] CombineGVCFs failed (exit_code=245)
+[2026-03-02 13:11:47] [MONITOR] Resource monitor stopped (PID=3912955)
+[2026-03-02 13:11:47] [WARN:GATK] [dataset_40] exit_code=245 — see /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_40/stderr.log
+[2026-03-02 13:11:47] [GATK] [dataset_40] Done — status=failed wall_time=1s variants=0
+[2026-03-02 13:11:47] [GATK] [dataset_50] Starting — 50 GVCFs
+[2026-03-02 13:11:47] [MONITOR] Resource monitor started (PID=3913105) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_50/monitor.json
+[2026-03-02 13:11:47] [GATK] [dataset_50] Step A: CombineGVCFs...
+[2026-03-02 13:11:49] [WARN:GATK] [dataset_50] CombineGVCFs failed (exit_code=245)
+[2026-03-02 13:11:53] [MONITOR] Resource monitor stopped (PID=3913105)
+[2026-03-02 13:11:53] [WARN:GATK] [dataset_50] exit_code=245 — see /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_50/stderr.log
+[2026-03-02 13:11:53] [GATK] [dataset_50] Done — status=failed wall_time=2s variants=0
+[2026-03-02 13:11:53] [GATK] [dataset_60] Starting — 60 GVCFs
+[2026-03-02 13:11:53] [MONITOR] Resource monitor started (PID=3913228) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_60/monitor.json
+[2026-03-02 13:11:53] [GATK] [dataset_60] Step A: CombineGVCFs...
+[2026-03-02 13:11:54] [WARN:GATK] [dataset_60] CombineGVCFs failed (exit_code=245)
+[2026-03-02 13:11:58] [MONITOR] Resource monitor stopped (PID=3913228)
+[2026-03-02 13:11:58] [WARN:GATK] [dataset_60] exit_code=245 — see /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_60/stderr.log
+[2026-03-02 13:11:58] [GATK] [dataset_60] Done — status=failed wall_time=1s variants=0
+[2026-03-02 13:11:58] [GATK] [dataset_70] Starting — 70 GVCFs
+[2026-03-02 13:11:58] [MONITOR] Resource monitor started (PID=3913385) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_70/monitor.json
+[2026-03-02 13:11:58] [GATK] [dataset_70] Step A: CombineGVCFs...
+[2026-03-02 13:11:59] [WARN:GATK] [dataset_70] CombineGVCFs failed (exit_code=245)
+[2026-03-02 13:12:03] [MONITOR] Resource monitor stopped (PID=3913385)
+[2026-03-02 13:12:03] [WARN:GATK] [dataset_70] exit_code=245 — see /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_70/stderr.log
+[2026-03-02 13:12:03] [GATK] [dataset_70] Done — status=failed wall_time=1s variants=0
+[2026-03-02 13:12:03] [GATK] [dataset_80] Starting — 80 GVCFs
+[2026-03-02 13:12:04] [MONITOR] Resource monitor started (PID=3913528) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_80/monitor.json
+[2026-03-02 13:12:04] [GATK] [dataset_80] Step A: CombineGVCFs...
+[2026-03-02 13:12:05] [WARN:GATK] [dataset_80] CombineGVCFs failed (exit_code=245)
+[2026-03-02 13:12:09] [MONITOR] Resource monitor stopped (PID=3913528)
+[2026-03-02 13:12:09] [WARN:GATK] [dataset_80] exit_code=245 — see /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_80/stderr.log
+[2026-03-02 13:12:09] [GATK] [dataset_80] Done — status=failed wall_time=1s variants=0
+[2026-03-02 13:12:09] [GATK] [dataset_90] Starting — 90 GVCFs
+[2026-03-02 13:12:09] [MONITOR] Resource monitor started (PID=3913696) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_90/monitor.json
+[2026-03-02 13:12:09] [GATK] [dataset_90] Step A: CombineGVCFs...
+[2026-03-02 13:12:10] [WARN:GATK] [dataset_90] CombineGVCFs failed (exit_code=245)
+[2026-03-02 13:12:14] [MONITOR] Resource monitor stopped (PID=3913696)
+[2026-03-02 13:12:14] [WARN:GATK] [dataset_90] exit_code=245 — see /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_90/stderr.log
+[2026-03-02 13:12:14] [GATK] [dataset_90] Done — status=failed wall_time=1s variants=0
+[2026-03-02 13:12:14] [GATK] [dataset_100] Starting — 100 GVCFs
+[2026-03-02 13:12:14] [MONITOR] Resource monitor started (PID=3913877) → /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_100/monitor.json
+[2026-03-02 13:12:14] [GATK] [dataset_100] Step A: CombineGVCFs...
+[2026-03-02 13:12:16] [WARN:GATK] [dataset_100] CombineGVCFs failed (exit_code=245)
+[2026-03-02 13:12:20] [MONITOR] Resource monitor stopped (PID=3913877)
+[2026-03-02 13:12:20] [WARN:GATK] [dataset_100] exit_code=245 — see /nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/benchmarks/02_execution/gatk/dataset_100/stderr.log
+[2026-03-02 13:12:20] [GATK] [dataset_100] Done — status=failed wall_time=2s variants=0
+[2026-03-02 13:12:20] [GATK] GATK benchmark complete.
+[2026-03-02 13:12:20] [BENCH] gatk benchmark completed.
+[2026-03-02 13:12:20] [REPORT] === Step 3: Generating Reports ===
+[2026-03-02 14:55:01] [PARABRICKS] ============================================================
+[2026-03-02 14:55:01] [PARABRICKS] Parabricks Benchmark — sizes: 10 20 30 40 50 60 70 80 90 100
+[2026-03-02 14:55:01] [PARABRICKS] ============================================================
+[2026-03-02 14:55:01] [PARABRICKS] Using: /usr/bin/docker
+[2026-03-02 14:55:01] [PARABRICKS] Reference: /home/alisongonpereira/raid/largefiles/hg38_fasta/Homo_sapiens_assembly38.fasta
+[2026-03-02 14:55:01] [PARABRICKS] GPU device: 0
+[2026-03-02 14:55:01] [PARABRICKS] GPU: NVIDIA A100-SXM4-40GB
+[2026-03-02 14:55:01] [PARABRICKS] [dataset_10] Already completed — skipping
+[2026-03-02 14:55:01] [PARABRICKS] [dataset_20] Already completed — skipping
+[2026-03-02 14:55:01] [PARABRICKS] [dataset_30] Already completed — skipping
+[2026-03-02 14:55:01] [PARABRICKS] [dataset_40] Already completed — skipping
+[2026-03-02 14:55:01] [PARABRICKS] [dataset_50] Already completed — skipping
+[2026-03-02 14:55:01] [PARABRICKS] [dataset_60] Already completed — skipping
+[2026-03-02 14:55:01] [PARABRICKS] [dataset_70] Already completed — skipping
+[2026-03-02 14:55:01] [PARABRICKS] [dataset_80] Already completed — skipping
+[2026-03-02 14:55:01] [PARABRICKS] [dataset_90] Already completed — skipping
+[2026-03-02 14:55:01] [PARABRICKS] [dataset_100] Already completed — skipping
+[2026-03-02 14:55:01] [PARABRICKS] Parabricks benchmark complete.

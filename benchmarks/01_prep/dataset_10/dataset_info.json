@@ -1,0 +1,28 @@
+{
+  "dataset_size": 10,
+  "created_at": "2026-03-02T11:08:37.124301",
+  "manifest": [
+    "/nfs/theseus/Local_Collaborators/dcas/CLARA_Exome/Germinative_v2/CLARA-004-01-RFN/vcf/CLARA-004-01-RFN.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/dcas/CLARA_Exome/Germinative_v2/CLARA-014-01-RFN/vcf/CLARA-014-01-RFN.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/dcas/CLARA_Exome/Germinative_v2/CLARA-015-01-RFN/vcf/CLARA-015-01-RFN.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/dcas/CLARA_Exome/Germinative_v2/CLARA-019-01-RCR/vcf/CLARA-019-01-RCR.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/dcas/CLARA_Exome/Germinative_v2/CLARA-031-01-RFN/vcf/CLARA-031-01-RFN.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/dcas/CLARA_Exome/Germinative_v2/CLARA-034-01-RCR/vcf/CLARA-034-01-RCR.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/dcas/CLARA_Exome/Germinative_v2/CLARA-039-01-RCR/vcf/CLARA-039-01-RCR.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/dcas/CLARA_Exome/Germinative_v2/CLARA-098-01-RCR/vcf/CLARA-098-01-RCR.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/dcas/CLARA_Exome/Germinative_v2/CLARA-104-01-RFN/vcf/CLARA-104-01-RFN.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/dcas/CLARA_Exome/Germinative_v2/CLARA-113-01-RFN/vcf/CLARA-113-01-RFN.hc.g.vcf.gz"
+  ],
+  "source_files": [
+    "/nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs/CLARA-004-01-RFN.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs/CLARA-014-01-RFN.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs/CLARA-015-01-RFN.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs/CLARA-019-01-RCR.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs/CLARA-031-01-RFN.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs/CLARA-034-01-RCR.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs/CLARA-039-01-RCR.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs/CLARA-098-01-RCR.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs/CLARA-104-01-RFN.hc.g.vcf.gz",
+    "/nfs/theseus/Local_Collaborators/alepereira/gvcf_profiling/gvcf_stability_benchmark/input_gvcfs/CLARA-113-01-RFN.hc.g.vcf.gz"
+  ]
+}
