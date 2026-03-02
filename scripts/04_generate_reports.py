@@ -96,6 +96,7 @@ def find_inflections(x_vals, y_vals, rel_threshold=0.5):
 
 # ─── Data loading ─────────────────────────────────────────────────────────────
 
+
 SOFTWARES  = ["glnexus", "parabricks", "gatk"]
 SOFT_LABEL = {"glnexus": "GLnexus", "parabricks": "Parabricks", "gatk": "GATK"}
 SOFT_COLOR = {"glnexus": "#1f77b4", "parabricks": "#ff7f0e", "gatk": "#2ca02c"}
@@ -154,6 +155,42 @@ def load_all_metrics(metrics_dir: Path) -> dict:
     return data
 
 
+def load_variant_data(metrics_dir: Path) -> tuple[dict, dict]:
+    """
+    Load variant analysis outputs produced by 03_analyze_variants.py.
+
+    Returns:
+        analysis_data  – {software: {size: gq_data_dict}}
+        overlap_data   – {size: overlap_dict}
+    """
+    analysis: dict[str, dict[int, dict]] = {s: {} for s in SOFTWARES}
+    overlap:  dict[int, dict]            = {}
+
+    for path in sorted(metrics_dir.glob("variant_analysis_*.json")):
+        m = re.match(r"variant_analysis_(\w+)_(\d+)\.json", path.name)
+        if not m:
+            continue
+        sw, size = m.group(1), int(m.group(2))
+        try:
+            with open(path) as f:
+                analysis.setdefault(sw, {})[size] = json.load(f)
+        except Exception as e:
+            print(f"[WARN] Could not read {path}: {e}")
+
+    for path in sorted(metrics_dir.glob("variant_overlap_*.json")):
+        m = re.match(r"variant_overlap_(\d+)\.json", path.name)
+        if not m:
+            continue
+        size = int(m.group(1))
+        try:
+            with open(path) as f:
+                overlap[size] = json.load(f)
+        except Exception as e:
+            print(f"[WARN] Could not read {path}: {e}")
+
+    return analysis, overlap
+
+
 def build_series(data: dict, metric: str) -> dict[str, tuple[list, list]]:
     """
     Returns {software: (x_vals, y_vals)} for the given metric,
@@ -174,6 +211,293 @@ def build_series(data: dict, metric: str) -> dict[str, tuple[list, list]]:
         if xs:
             series[sw] = (xs, ys)
     return series
+
+
+# ─── Variant analysis helpers ────────────────────────────────────────────────
+
+def _gq_line_colors(base_hex: str, n_lines: int) -> list[str]:
+    """Gradient of RGBA colours: light (α=0.25) → opaque (α=1.0)."""
+    r = int(base_hex[1:3], 16)
+    g = int(base_hex[3:5], 16)
+    b = int(base_hex[5:7], 16)
+    colors = []
+    for i in range(n_lines):
+        alpha = 0.25 + 0.75 * (i / max(n_lines - 1, 1))
+        colors.append(f"rgba({r},{g},{b},{alpha:.2f})")
+    return colors
+
+
+def _gq_chart_js(
+    div_id: str,
+    sw: str,
+    size_hist_list: list,   # sorted list of (size, hist_dict)
+    title: str,
+) -> str:
+    """Return Plotly.newPlot(...) JS for a GQ density histogram."""
+    bin_starts = list(range(0, 100, 5))
+    bin_mids   = [b + 2.5 for b in bin_starts]
+    base_color = SOFT_COLOR.get(sw, "#888")
+    colors     = _gq_line_colors(base_color, len(size_hist_list))
+
+    traces = []
+    for i, (size, hist) in enumerate(size_hist_list):
+        ys = [round(float(hist.get(str(b), 0)), 6) for b in bin_starts]
+        traces.append(json.dumps({
+            "x": bin_mids,
+            "y": ys,
+            "name": f"N={size}",
+            "mode": "lines",
+            "line": {"color": colors[i], "width": 2},
+            "hovertemplate": f"N={size} | GQ=%{{x:.0f}} | density=%{{y:.4f}}<extra></extra>",
+        }))
+
+    layout = {
+        "title": {"text": title, "font": {"size": 13}},
+        "xaxis": {"title": "Genotype Quality (GQ)", "gridcolor": "#eee", "range": [0, 100]},
+        "yaxis": {"title": "Density", "gridcolor": "#eee"},
+        "margin": {"l": 60, "r": 10, "t": 40, "b": 60},
+        "paper_bgcolor": "rgba(0,0,0,0)",
+        "plot_bgcolor": "#fafafa",
+        "font": {"family": "Segoe UI, Arial", "size": 11},
+        "legend": {"orientation": "h", "y": -0.35, "font": {"size": 10}},
+        "hovermode": "x unified",
+    }
+    return (
+        f"Plotly.newPlot('{div_id}', [{', '.join(traces)}], "
+        f"{json.dumps(layout)}, {{responsive: true}});"
+    )
+
+
+def _pct_str(count: int, total: int) -> str:
+    if total == 0:
+        return "0%"
+    return f"{100 * count / total:.1f}%"
+
+
+def _make_venn_svg(overlap: dict) -> str:
+    """Return an inline SVG Venn diagram for 2 or 3 tools."""
+    tools     = overlap.get("tools", [])
+    total     = overlap.get("total_unique", 0)
+    counts    = overlap.get("counts", {})
+    exclusive = overlap.get("exclusive", {})
+    all_common = overlap.get("all_common", 0)
+    pairwise  = overlap.get("pairwise_only", {})
+    size      = overlap.get("dataset_size", "?")
+
+    def fmt(n):
+        return f"{n:,}" if isinstance(n, int) else str(n)
+
+    def label_block(cx, cy, main_val, sub_val):
+        return (
+            f'<text x="{cx}" y="{cy}" text-anchor="middle" '
+            f'font-size="13" font-weight="bold">{fmt(main_val)}</text>'
+            f'<text x="{cx}" y="{cy + 17}" text-anchor="middle" '
+            f'font-size="11" fill="#666">{sub_val}</text>'
+        )
+
+    n_tools = len(tools)
+
+    if n_tools == 2:
+        t1, t2 = tools
+        c1  = SOFT_COLOR.get(t1, "#888")
+        c2  = SOFT_COLOR.get(t2, "#999")
+        ex1 = exclusive.get(t1, 0)
+        ex2 = exclusive.get(t2, 0)
+        common = all_common
+
+        svg = (
+            '<svg viewBox="0 0 500 250" xmlns="http://www.w3.org/2000/svg" '
+            'style="max-width:480px;width:100%">\n'
+            # circles
+            f'  <circle cx="175" cy="122" r="118" fill="{c1}" opacity="0.30" stroke="{c1}" stroke-width="2"/>\n'
+            f'  <circle cx="325" cy="122" r="118" fill="{c2}" opacity="0.30" stroke="{c2}" stroke-width="2"/>\n'
+            # tool names
+            f'  <text x="112" y="17" text-anchor="middle" font-size="13" font-weight="bold" fill="{c1}">{SOFT_LABEL.get(t1, t1)}</text>\n'
+            f'  <text x="388" y="17" text-anchor="middle" font-size="13" font-weight="bold" fill="{c2}">{SOFT_LABEL.get(t2, t2)}</text>\n'
+            # counts
+            + label_block(108, 118, ex1, _pct_str(ex1, total)) + "\n"
+            + label_block(250, 118, common, _pct_str(common, total)) + "\n"
+            + label_block(392, 118, ex2, _pct_str(ex2, total)) + "\n"
+            # footer
+            f'  <text x="250" y="244" text-anchor="middle" font-size="11" fill="#888">'
+            f'Total unique: {fmt(total)}\u2002|\u2002N={size}</text>\n'
+            "</svg>"
+        )
+        return svg
+
+    elif n_tools >= 3:
+        t1, t2, t3 = tools[0], tools[1], tools[2]
+        c1  = SOFT_COLOR.get(t1, "#888")
+        c2  = SOFT_COLOR.get(t2, "#999")
+        c3  = SOFT_COLOR.get(t3, "#aaa")
+        ex1 = exclusive.get(t1, 0)
+        ex2 = exclusive.get(t2, 0)
+        ex3 = exclusive.get(t3, 0)
+        p12 = pairwise.get(f"{t1}_{t2}", 0)
+        p13 = pairwise.get(f"{t1}_{t3}", 0)
+        p23 = pairwise.get(f"{t2}_{t3}", 0)
+
+        svg = (
+            '<svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg" '
+            'style="max-width:480px;width:100%">\n'
+            # circles (equilateral triangle layout)
+            f'  <circle cx="175" cy="148" r="115" fill="{c1}" opacity="0.28" stroke="{c1}" stroke-width="2"/>\n'
+            f'  <circle cx="325" cy="148" r="115" fill="{c2}" opacity="0.28" stroke="{c2}" stroke-width="2"/>\n'
+            f'  <circle cx="250" cy="275" r="115" fill="{c3}" opacity="0.28" stroke="{c3}" stroke-width="2"/>\n'
+            # tool names
+            f'  <text x="95"  y="37" text-anchor="middle" font-size="13" font-weight="bold" fill="{c1}">{SOFT_LABEL.get(t1, t1)}</text>\n'
+            f'  <text x="405" y="37" text-anchor="middle" font-size="13" font-weight="bold" fill="{c2}">{SOFT_LABEL.get(t2, t2)}</text>\n'
+            f'  <text x="250" y="390" text-anchor="middle" font-size="13" font-weight="bold" fill="{c3}">{SOFT_LABEL.get(t3, t3)}</text>\n'
+            # exclusive regions
+            + label_block(90,  135, ex1, _pct_str(ex1, total)) + "\n"
+            + label_block(410, 135, ex2, _pct_str(ex2, total)) + "\n"
+            + label_block(250, 350, ex3, _pct_str(ex3, total)) + "\n"
+            # pairwise-only regions
+            + label_block(250, 108, p12, _pct_str(p12, total)) + "\n"
+            + label_block(148, 248, p13, _pct_str(p13, total)) + "\n"
+            + label_block(352, 248, p23, _pct_str(p23, total)) + "\n"
+            # all-common
+            + label_block(250, 203, all_common, _pct_str(all_common, total)) + "\n"
+            # footer
+            f'  <text x="250" y="410" text-anchor="middle" font-size="11" fill="#888">'
+            f'Total unique: {fmt(total)}\u2002|\u2002N={size}</text>\n'
+            "</svg>"
+        )
+        return svg
+
+    return '<p style="color:#888;padding:12px">Not enough tools with results for Venn diagram.</p>'
+
+
+def build_variant_tab(
+    analysis_data: dict,   # {software: {size: gq_data_dict}}
+    overlap_data:  dict,   # {size: overlap_dict}
+) -> tuple[str, str]:
+    """Return (html_content, js_calls) for the Variant Analysis tab."""
+    html_parts: list[str] = []
+    js_parts:   list[str] = []
+
+    has_any_gq = any(
+        bool(analysis_data.get(sw, {})) for sw in SOFTWARES
+    )
+
+    if not has_any_gq and not overlap_data:
+        html_parts.append(
+            '<p style="padding:24px;color:#888">'
+            "No variant analysis data found. "
+            "Run <code>scripts/03_analyze_variants.py</code> to generate."
+            "</p>"
+        )
+        return "\n".join(html_parts), ""
+
+    # ── GQ Histograms ─────────────────────────────────────────────────────────
+    if has_any_gq:
+        html_parts.append(
+            '<div class="section-title">Genotype Quality (GQ) Distribution</div>'
+        )
+        html_parts.append(
+            '<p style="color:#666;font-size:0.85rem;margin:-8px 0 12px">'
+            "Each line = one dataset size (N=10 … 100). "
+            "Density = fraction of genotype calls in each 5-unit GQ bin.</p>"
+        )
+        html_parts.append('<div class="grid-3">')
+
+        for sw in SOFTWARES:
+            div_id = f"chart_gq_{sw}"
+            html_parts.append(
+                f'<div class="card"><div id="{div_id}" style="height:320px"></div></div>'
+            )
+            sw_data = analysis_data.get(sw, {})
+            size_hist_list = [
+                (sz, rec["gq_histogram"])
+                for sz in sorted(sw_data)
+                if (rec := sw_data[sz]) and rec.get("gq_histogram")
+            ]
+            label = SOFT_LABEL.get(sw, sw)
+            if size_hist_list:
+                js_parts.append(
+                    _gq_chart_js(div_id, sw, size_hist_list,
+                                 f"GQ Distribution — {label}")
+                )
+            else:
+                js_parts.append(
+                    f"document.getElementById('{div_id}').innerHTML="
+                    f"'<p style=\"padding:20px;color:#888\">No GQ data for {label}</p>';"
+                )
+
+        html_parts.append("</div>")  # end grid-3
+
+    # ── Venn Diagrams ─────────────────────────────────────────────────────────
+    if overlap_data:
+        html_parts.append(
+            '<div class="section-title">Variant Call Overlap (Venn Diagram)</div>'
+        )
+        available_sizes = sorted(overlap_data.keys())
+
+        html_parts.append(
+            '<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">'
+        )
+        for sz in available_sizes:
+            od  = overlap_data[sz]
+            svg = _make_venn_svg(od)
+            html_parts.append(
+                f'<div class="card" style="flex:0 0 auto;width:260px">'
+                f'<h3 style="font-size:0.85rem;margin-bottom:6px">N = {sz}</h3>'
+                f"{svg}</div>"
+            )
+        html_parts.append("</div>")
+
+        # ── Overlap summary table ─────────────────────────────────────────────
+        html_parts.append(
+            '<div class="section-title">Variant Overlap Statistics</div>'
+        )
+        all_tools = sorted({
+            t for od in overlap_data.values() for t in od.get("tools", [])
+        })
+        html_parts.append('<div class="card" style="overflow-x:auto"><table>')
+
+        # Header
+        header = ["<th>N</th>", "<th>Total unique</th>"]
+        for t in all_tools:
+            header.append(f"<th>{SOFT_LABEL.get(t, t)} only</th>")
+        if len(all_tools) == 2:
+            header.append("<th>Common</th>")
+        elif len(all_tools) >= 3:
+            for i in range(len(all_tools)):
+                for j in range(i + 1, len(all_tools)):
+                    l1 = SOFT_LABEL.get(all_tools[i], all_tools[i])
+                    l2 = SOFT_LABEL.get(all_tools[j], all_tools[j])
+                    header.append(f"<th>{l1} ∩ {l2} only</th>")
+            header.append("<th>All common</th>")
+        html_parts.append("<tr>" + "".join(header) + "</tr>")
+
+        for sz in available_sizes:
+            od       = overlap_data[sz]
+            total    = od.get("total_unique", 0)
+            excl     = od.get("exclusive", {})
+            pairwise = od.get("pairwise_only", {})
+
+            def _cell(val):
+                if not isinstance(val, int):
+                    return "<td>—</td>"
+                return f"<td>{val:,} ({_pct_str(val, total)})</td>"
+
+            row = [f"<td>{sz}</td>", f"<td>{total:,}</td>"]
+            for t in all_tools:
+                row.append(_cell(excl.get(t)))
+            if len(all_tools) == 2:
+                row.append(_cell(od.get("all_common", 0)))
+            elif len(all_tools) >= 3:
+                for i in range(len(all_tools)):
+                    for j in range(i + 1, len(all_tools)):
+                        key = f"{all_tools[i]}_{all_tools[j]}"
+                        row.append(_cell(pairwise.get(key)))
+                row.append(_cell(od.get("all_common", 0)))
+
+            html_parts.append("<tr>" + "".join(row) + "</tr>")
+
+        html_parts.append("</table></div>")
+
+    return "\n".join(html_parts), "\n".join(js_parts)
 
 
 # ─── HTML / Plotly report ─────────────────────────────────────────────────────
@@ -485,13 +809,23 @@ def _render_caveats(caveats: list[str] | None) -> str:
     )
 
 
-def generate_html(data: dict, output_path: Path, caveats: list[str] | None = None):
+def generate_html(
+    data: dict,
+    output_path: Path,
+    caveats: list[str] | None = None,
+    analysis_data: dict | None = None,
+    overlap_data:  dict | None = None,
+):
     cmp_html,   cmp_js   = build_comparison_tab(data)
     sw_tabs = {}
     sw_js   = {}
     for sw in SOFTWARES:
         sw_tabs[sw], sw_js[sw] = build_software_tab(sw, data)
     raw_html = build_rawdata_tab(data)
+
+    var_html, var_js = build_variant_tab(
+        analysis_data or {}, overlap_data or {}
+    )
 
     # Count summary stats
     total_runs    = sum(len(sd) for sd in data.values())
@@ -554,6 +888,7 @@ def generate_html(data: dict, output_path: Path, caveats: list[str] | None = Non
   <button class="tab-btn" onclick="showTab('tab-glnexus',this)">GLnexus</button>
   <button class="tab-btn" onclick="showTab('tab-parabricks',this)">Parabricks</button>
   <button class="tab-btn" onclick="showTab('tab-gatk',this)">GATK</button>
+  <button class="tab-btn" onclick="showTab('tab-variants',this)">Variant Analysis</button>
   <button class="tab-btn" onclick="showTab('tab-raw',this)">Raw Data</button>
 </div>
 
@@ -571,6 +906,10 @@ def generate_html(data: dict, output_path: Path, caveats: list[str] | None = Non
 
 <div id="tab-gatk" class="tab-content">
 {sw_tabs.get('gatk','')}
+</div>
+
+<div id="tab-variants" class="tab-content">
+{var_html}
 </div>
 
 <div id="tab-raw" class="tab-content">
@@ -592,6 +931,8 @@ def generate_html(data: dict, output_path: Path, caveats: list[str] | None = Non
   {sw_js.get('glnexus','')}
   {sw_js.get('parabricks','')}
   {sw_js.get('gatk','')}
+  // Variant analysis tab
+  {var_js}
 }})();
 </script>
 
@@ -788,6 +1129,11 @@ def main():
     total = sum(len(sd) for sd in data.values())
     print(f"[REPORT] Loaded {total} metric records")
 
+    analysis_data, overlap_data = load_variant_data(metrics_dir)
+    n_gq  = sum(len(v) for v in analysis_data.values())
+    n_ovl = len(overlap_data)
+    print(f"[REPORT] Variant analysis: {n_gq} GQ histograms, {n_ovl} overlap records")
+
     if total == 0:
         print("[WARN] No metrics found — reports will be empty but will still be created")
 
@@ -804,7 +1150,7 @@ def main():
     excel_path = output_dir / "benchmark_data.xlsx"
 
     try:
-        generate_html(data, html_path, caveats)
+        generate_html(data, html_path, caveats, analysis_data, overlap_data)
         print(f"[REPORT] HTML written: {html_path}")
     except Exception as exc:
         print(f"[ERROR] HTML generation failed: {exc}", file=sys.stderr)

@@ -172,10 +172,16 @@ run_software() {
 
 # ─── Reports ──────────────────────────────────────────────────────────────────
 run_reports() {
-    log "REPORT" "=== Step 3: Generating Reports ==="
+    log "REPORT" "=== Step 3a: Variant Quality Analysis ==="
 
-    # env -u LD_PRELOAD: same libjemalloc + C-extension conflict that kills
-    # GATK also affects openpyxl (via lxml) when generating the Excel file.
+    # env -u LD_PRELOAD: libjemalloc (set for GLnexus) conflicts with bcftools
+    # C extensions and openpyxl/lxml.  Always unset before Python invocations.
+    env -u LD_PRELOAD python3 "${SCRIPTS_DIR}/03_analyze_variants.py" \
+        --benchmark-dir "${BENCHMARK_DIR}" \
+    || warn "REPORT" "Variant analysis failed or incomplete (continuing to report)"
+
+    log "REPORT" "=== Step 3b: Generating Reports ==="
+
     env -u LD_PRELOAD python3 "${SCRIPTS_DIR}/04_generate_reports.py" \
         --benchmark-dir "${BENCHMARK_DIR}" \
         --output-dir    "${BENCHMARK_DIR}/04_reports"
