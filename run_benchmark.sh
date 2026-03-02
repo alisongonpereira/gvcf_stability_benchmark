@@ -187,14 +187,22 @@ run_reports() {
         --benchmark-dir "${BENCHMARK_DIR}" \
     || warn "REPORT" "Variant analysis failed or incomplete (continuing to report)"
 
-    log "REPORT" "=== Step 3b: Generating Reports ==="
+    log "REPORT" "=== Step 3b: Generating Performance Report ==="
 
-    env -u LD_PRELOAD python3 "${SCRIPTS_DIR}/04_generate_reports.py" \
+    env -u LD_PRELOAD python3 "${SCRIPTS_DIR}/04a_generate_reports.py" \
         --benchmark-dir "${BENCHMARK_DIR}" \
         --output-dir    "${BENCHMARK_DIR}/04_reports"
 
-    log "REPORT" "HTML : ${BENCHMARK_DIR}/04_reports/benchmark_report.html"
-    log "REPORT" "Excel: ${BENCHMARK_DIR}/04_reports/benchmark_data.xlsx"
+    log "REPORT" "=== Step 3c: Generating Concordance Report ==="
+
+    env -u LD_PRELOAD python3 "${SCRIPTS_DIR}/04b_concordance_report.py" \
+        --benchmark-dir "${BENCHMARK_DIR}" \
+        --output-dir    "${BENCHMARK_DIR}/04_reports" \
+    || warn "REPORT" "Concordance report failed or incomplete (continuing)"
+
+    log "REPORT" "HTML         : ${BENCHMARK_DIR}/04_reports/benchmark_report.html"
+    log "REPORT" "Excel        : ${BENCHMARK_DIR}/04_reports/benchmark_data.xlsx"
+    log "REPORT" "Concordância : ${BENCHMARK_DIR}/04_reports/concordance_report.html"
 }
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
@@ -245,8 +253,9 @@ main() {
     echo "╔══════════════════════════════════════════════════════════╗"
     echo "║              BENCHMARK COMPLETE                          ║"
     echo "╠══════════════════════════════════════════════════════════╣"
-    echo "║  HTML report : benchmarks/04_reports/benchmark_report.html"
-    echo "║  Excel report: benchmarks/04_reports/benchmark_data.xlsx"
+    echo "║  Performance : benchmarks/04_reports/benchmark_report.html"
+    echo "║  Concordância: benchmarks/04_reports/concordance_report.html"
+    echo "║  Excel       : benchmarks/04_reports/benchmark_data.xlsx"
     echo "║  Full log    : benchmarks/04_reports/execution.log"
     echo "╚══════════════════════════════════════════════════════════╝"
 }

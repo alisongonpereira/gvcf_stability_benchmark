@@ -915,6 +915,278 @@ def build_rawdata_tab(data: dict) -> str:
     return "\n".join(html)
 
 
+TARGET_22K = 22_000   # target cohort size for extrapolation
+
+# Projection sizes shown in extrapolation charts
+EXTRAP_TARGETS = [500, 1_000, 2_500, 5_000, 10_000, 22_000]
+
+
+def _powerlaw_fit(xs: list[float], ys: list[float]):
+    """
+    Fit y = a * x^b via log-linear regression.
+    Returns (a, b) or (None, None) if fit fails.
+    Only uses points where x > 0 and y > 0.
+    """
+    log_x, log_y = [], []
+    for xi, yi in zip(xs, ys):
+        if xi > 0 and yi > 0:
+            log_x.append(math.log(xi))
+            log_y.append(math.log(yi))
+    if len(log_x) < 2:
+        return None, None
+    b, log_a = _linreg(log_x, log_y)
+    if b is None:
+        return None, None
+    return math.exp(log_a), b
+
+
+def _powerlaw_r2(xs: list[float], ys: list[float], a: float, b: float) -> float:
+    """R² of a power-law fit."""
+    pts = [(xi, yi) for xi, yi in zip(xs, ys) if xi > 0 and yi > 0]
+    if len(pts) < 2:
+        return 0.0
+    y_vals  = [yi for _, yi in pts]
+    y_pred  = [a * xi ** b for xi, _ in pts]
+    my      = _mean(y_vals)
+    ss_tot  = sum((yi - my) ** 2 for yi in y_vals) or 1e-12
+    ss_res  = sum((yi - yp) ** 2 for (_, yi), yp in zip(pts, y_pred))
+    return max(0.0, min(1.0, round(1 - ss_res / ss_tot, 4)))
+
+
+def build_extrapolation_tab(data: dict) -> tuple[str, str]:
+    """
+    Build the Extrapolação tab: power-law & linear fits on observed data,
+    projected to EXTRAP_TARGETS up to TARGET_22K samples.
+
+    Returns (html_content, js_calls).
+    """
+    html_parts = [
+        '<div class="section-title">Extrapolação para Grandes Coortes</div>',
+        '<div style="background:#e8f4fd;border-left:4px solid #2196F3;padding:14px 24px;'
+        'margin:0 0 20px;border-radius:4px">',
+        '<strong>⚠ Ressalvas sobre esta análise:</strong>',
+        '<ul style="margin:8px 0 0 16px;line-height:1.7">',
+        '<li>As projeções são baseadas em <strong>ajustes matemáticos</strong> (lei de potência e linear) '
+        'sobre dados de 10–100 amostras. Comportamentos não-lineares podem surgir em escalas maiores.</li>',
+        '<li>Em <strong>22.000 amostras</strong>, o pipeline envolve etapas adicionais '
+        '(particionamento por cromossomo, paralelização distribuída) que não estão refletidas aqui.</li>',
+        '<li>Consumo de <strong>RAM e disco</strong> podem ser limitantes antes mesmo do tempo.</li>',
+        '<li>Resultados de R² próximos de 1 indicam boa aderência ao modelo — '
+        'valores baixos sugerem comportamento não-monotônico e extrapolação menos confiável.</li>',
+        '<li>Use estas projeções como <strong>estimativa de ordem de grandeza</strong>, '
+        'não como previsão precisa.</li>',
+        '</ul></div>',
+    ]
+    js_parts = []
+    chart_idx = 0
+
+    # Metrics to extrapolate: (key, label, unit, scale_fn for display)
+    extrap_metrics = [
+        ("wall_time_s",     "Tempo de Execução (s)",   "s"),
+        ("wall_time_h",     "Tempo de Execução (h)",   "h"),
+        ("ram_used_gb_max", "RAM Pico (GB)",            "GB"),
+        ("cpu_pct_avg",     "CPU Médio (%)",            "%"),
+    ]
+
+    # Project to target sizes
+    proj_xs = sorted(set(EXTRAP_TARGETS))
+
+    for metric_key, metric_label, unit in extrap_metrics:
+        div_id = f"chart_extrap_{chart_idx}"
+        chart_idx += 1
+
+        html_parts.append(
+            f'<div class="card" style="margin-bottom:24px">'
+            f'<div class="section-title" style="font-size:1rem">{metric_label}</div>'
+            f'<div id="{div_id}" style="height:360px"></div>'
+            f'</div>'
+        )
+
+        traces = []
+
+        for sw in SOFTWARES:
+            size_dict = data.get(sw, {})
+            color = SOFT_COLOR.get(sw, "#888")
+            label = SOFT_LABEL.get(sw, sw)
+
+            # Gather observed means
+            xs_obs, ys_obs = [], []
+            for size in sorted(size_dict):
+                reps = size_dict[size]
+                if metric_key == "wall_time_h":
+                    vals = [r.get("wall_time_s", 0) / 3600 for r in reps
+                            if r.get("status") == "success"
+                            and isinstance(r.get("wall_time_s"), (int, float))]
+                else:
+                    vals = [r.get(metric_key) for r in reps
+                            if r.get("status") == "success"
+                            and isinstance(r.get(metric_key), (int, float))]
+                if vals:
+                    xs_obs.append(float(size))
+                    ys_obs.append(_mean(vals))
+
+            if not xs_obs:
+                continue
+
+            # Observed points
+            traces.append(json.dumps({
+                "x": xs_obs, "y": [round(v, 4) for v in ys_obs],
+                "name": f"{label} (observado)",
+                "mode": "markers",
+                "marker": {"size": 9, "color": color, "symbol": "circle"},
+                "showlegend": True,
+                "hovertemplate": f"{label}: %{{y:.2f}} {unit} (N=%{{x}})<extra>observado</extra>",
+            }))
+
+            # Power-law fit
+            a_pl, b_pl = _powerlaw_fit(xs_obs, ys_obs)
+            if a_pl is not None:
+                all_xs = sorted(set(xs_obs + [float(x) for x in proj_xs]))
+                ys_pl  = [a_pl * (xi ** b_pl) for xi in all_xs]
+                r2_pl  = _powerlaw_r2(xs_obs, ys_obs, a_pl, b_pl)
+                traces.append(json.dumps({
+                    "x": all_xs, "y": [round(v, 4) for v in ys_pl],
+                    "name": f"{label} (lei potência, R²={r2_pl:.3f})",
+                    "mode": "lines",
+                    "line": {"color": color, "dash": "solid", "width": 2},
+                    "opacity": 0.85,
+                    "showlegend": True,
+                    "hovertemplate": (
+                        f"{label} potência: %{{y:.2f}} {unit} @ N=%{{x}}"
+                        f" (y={a_pl:.3g}·x^{b_pl:.3f})<extra></extra>"
+                    ),
+                }))
+
+            # Linear fit (for comparison)
+            sl, ic = _linreg(xs_obs, ys_obs)
+            if sl is not None:
+                all_xs_lin = sorted(set(xs_obs + [float(x) for x in proj_xs]))
+                ys_lin     = [max(0.0, sl * xi + ic) for xi in all_xs_lin]
+                r2_lin     = compute_r2(xs_obs, ys_obs)
+                r2_str     = f"{r2_lin:.3f}" if r2_lin is not None else "N/A"
+                traces.append(json.dumps({
+                    "x": all_xs_lin, "y": [round(v, 4) for v in ys_lin],
+                    "name": f"{label} (linear, R²={r2_str})",
+                    "mode": "lines",
+                    "line": {"color": color, "dash": "dot", "width": 1},
+                    "opacity": 0.5,
+                    "showlegend": True,
+                    "hovertemplate": (
+                        f"{label} linear: %{{y:.2f}} {unit} @ N=%{{x}}<extra></extra>"
+                    ),
+                }))
+
+        if not traces:
+            html_parts.append(
+                f'<p style="color:#888;padding:20px">Sem dados para {metric_label}</p>'
+            )
+            continue
+
+        layout = dict(_CHART_LAYOUT_BASE)
+        layout["title"]  = {"text": f"{metric_label} — Observado + Projetado", "font": {"size": 14}}
+        layout["xaxis"]  = {
+            "title": "Número de amostras (GVCFs)", "type": "log",
+            "gridcolor": "#eee",
+            "tickvals": [10, 25, 50, 75, 100, 500, 1000, 2500, 5000, 10000, 22000],
+            "ticktext": ["10", "25", "50", "75", "100", "500", "1k", "2.5k", "5k", "10k", "22k"],
+        }
+        layout["yaxis"]  = {"title": f"{metric_label}", "gridcolor": "#eee"}
+        layout["shapes"] = [{
+            "type": "line", "x0": TARGET_22K, "x1": TARGET_22K,
+            "y0": 0, "y1": 1, "yref": "paper",
+            "line": {"color": "#d62728", "dash": "dash", "width": 2},
+        }]
+        layout["annotations"] = [{
+            "x": math.log10(TARGET_22K), "y": 0.97, "xref": "x", "yref": "paper",
+            "text": "22k amostras", "showarrow": False,
+            "font": {"color": "#d62728", "size": 11},
+        }]
+        layout["legend"] = {"orientation": "v", "x": 1.01, "y": 1, "font": {"size": 10}}
+        layout["margin"]  = {"l": 70, "r": 220, "t": 50, "b": 70}
+
+        js_parts.append(
+            f"Plotly.newPlot('{div_id}', [{', '.join(traces)}], "
+            f"{json.dumps(layout)}, {{responsive: true}});"
+        )
+
+    # Projection table at 22k
+    html_parts.append('<div class="section-title">Projeção em 22.000 amostras (lei de potência)</div>')
+    html_parts.append('<div class="card"><table>')
+    hdr = ["Software", "Tempo (s)", "Tempo (h)", "RAM Pico (GB)", "Modelo (expoente b)", "R²"]
+    html_parts.append("<tr>" + "".join(f"<th>{h}</th>" for h in hdr) + "</tr>")
+
+    for sw in SOFTWARES:
+        size_dict = data.get(sw, {})
+        label = SOFT_LABEL.get(sw, sw)
+
+        def _proj_22k(mk):
+            xs_o, ys_o = [], []
+            for size in sorted(size_dict):
+                reps = size_dict[size]
+                vals = [r.get(mk) for r in reps
+                        if r.get("status") == "success"
+                        and isinstance(r.get(mk), (int, float))]
+                if vals:
+                    xs_o.append(float(size))
+                    ys_o.append(_mean(vals))
+            if not xs_o:
+                return "—", None, None
+            a, b = _powerlaw_fit(xs_o, ys_o)
+            if a is None:
+                sl, ic = _linreg(xs_o, ys_o)
+                if sl is None:
+                    return "—", None, None
+                proj = max(0.0, sl * TARGET_22K + ic)
+                return f"{proj:,.0f}", None, compute_r2(xs_o, ys_o)
+            proj = a * (TARGET_22K ** b)
+            r2   = _powerlaw_r2(xs_o, ys_o, a, b)
+            return f"{proj:,.0f}", b, r2
+
+        t_s,  b_t, r2_t = _proj_22k("wall_time_s")
+        r_gb, b_r, r2_r = _proj_22k("ram_used_gb_max")
+
+        t_h = "—"
+        if t_s != "—":
+            try:
+                t_h = f"{float(t_s.replace(',','')) / 3600:,.1f}"
+            except Exception:
+                pass
+
+        b_str  = f"{b_t:.3f}" if b_t is not None else "linear"
+        r2_str = f"{r2_t:.4f}" if r2_t is not None else "—"
+
+        color_r2 = (
+            "#2ca02c" if r2_t and r2_t >= 0.95 else
+            "#ff7f0e" if r2_t and r2_t >= 0.80 else
+            "#d62728"
+        )
+
+        html_parts.append(
+            f"<tr>"
+            f'<td style="font-weight:600">{label}</td>'
+            f"<td>{t_s}</td>"
+            f"<td>{t_h}</td>"
+            f"<td>{r_gb}</td>"
+            f"<td>{b_str}</td>"
+            f'<td style="color:{color_r2};font-weight:600">{r2_str}</td>'
+            f"</tr>"
+        )
+
+    html_parts.append("</table></div>")
+
+    html_parts.append(
+        '<div style="background:#f8f9fa;border-radius:4px;padding:14px 24px;margin-top:16px;'
+        'font-size:0.85rem;color:#555">'
+        '<strong>Interpretação do expoente b (lei de potência y = a·x^b):</strong>'
+        ' b ≈ 1 → crescimento linear; b > 1 → super-linear (escala ruim); b &lt; 1 → sub-linear '
+        '(boa escalabilidade). RAM com b &gt; 1 indica que o servidor pode ficar sem memória antes '
+        'de completar 22k amostras com a abordagem atual.'
+        '</div>'
+    )
+
+    return "\n".join(html_parts), "\n".join(js_parts)
+
+
 def _render_caveats(caveats: list[str] | None) -> str:
     if not caveats:
         return ""
@@ -945,22 +1217,14 @@ def generate_html(
         analysis_data or {}, overlap_data or {}
     )
 
-    # Count summary stats
-    total_runs    = sum(len(sd) for sd in data.values())
-    success_runs  = sum(
-        sum(1 for r in sd.values() if r.get("status") == "success")
-        for sd in data.values()
-    )
-    total_variants = sum(
-        sum(r.get("variant_count", 0) or 0 for r in sd.values())
-        for sd in data.values()
-    )
+    ext_html, ext_js = build_extrapolation_tab(data)
 
-    all_times = [
-        r.get("wall_time_s", 0)
-        for sd in data.values() for r in sd.values()
-        if r.get("status") == "success"
-    ]
+    # Count summary stats (data: {sw: {size: [rep_dicts]}})
+    all_reps = [r for sd in data.values() for reps in sd.values() for r in reps]
+    total_runs    = len(all_reps)
+    success_runs  = sum(1 for r in all_reps if r.get("status") == "success")
+    total_variants = sum(r.get("variant_count", 0) or 0 for r in all_reps)
+    all_times = [r.get("wall_time_s", 0) for r in all_reps if r.get("status") == "success"]
     total_wall_h = round(sum(all_times) / 3600, 2) if all_times else 0
 
     html = f"""<!DOCTYPE html>
@@ -978,7 +1242,7 @@ def generate_html(
   <h1>GVCF Scalability Benchmark Report</h1>
   <p>Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} &nbsp;|&nbsp;
      Tools: GLnexus, NVIDIA CLARA Parabricks, GATK &nbsp;|&nbsp;
-     Dataset sizes: 10 – 100 GVCFs (step 10)</p>
+     Dataset sizes: 10, 25, 50, 75, 100 GVCFs (3 replicates)</p>
 </header>
 
 <!-- Summary cards -->
@@ -1008,6 +1272,7 @@ def generate_html(
   <button class="tab-btn" onclick="showTab('tab-gatk',this)">GATK CombineGVCFs</button>
   <button class="tab-btn" onclick="showTab('tab-gatk_genomicsdb',this)">GATK GenomicsDB</button>
   <button class="tab-btn" onclick="showTab('tab-variants',this)">Variant Analysis</button>
+  <button class="tab-btn" onclick="showTab('tab-extrap',this)">Extrapolação</button>
   <button class="tab-btn" onclick="showTab('tab-raw',this)">Raw Data</button>
 </div>
 
@@ -1035,6 +1300,10 @@ def generate_html(
 {var_html}
 </div>
 
+<div id="tab-extrap" class="tab-content">
+{ext_html}
+</div>
+
 <div id="tab-raw" class="tab-content">
 {raw_html}
 </div>
@@ -1057,6 +1326,8 @@ def generate_html(
   {sw_js.get('gatk_genomicsdb','')}
   // Variant analysis tab
   {var_js}
+  // Extrapolation tab
+  {ext_js}
 }})();
 </script>
 
