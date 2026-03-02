@@ -4,3 +4,8 @@ input_gvcfs/
 *.g.vcf.gz
 *.vcf
 *.vcf.gz
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
