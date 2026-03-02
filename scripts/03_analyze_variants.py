@@ -23,7 +23,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-SOFTWARES = ["glnexus", "parabricks", "gatk"]
+SOFTWARES = ["glnexus", "parabricks", "gatk", "gatk_genomicsdb"]
 SIZES     = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 BIN_WIDTH = 5   # GQ histogram bins: [0,5), [5,10), … [95,100]
 

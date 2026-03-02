@@ -58,6 +58,7 @@ setup_directories() {
         "${BENCHMARK_DIR}/02_execution/glnexus" \
         "${BENCHMARK_DIR}/02_execution/parabricks" \
         "${BENCHMARK_DIR}/02_execution/gatk" \
+        "${BENCHMARK_DIR}/02_execution/gatk_genomicsdb" \
         "${BENCHMARK_DIR}/03_metrics" \
         "${BENCHMARK_DIR}/04_reports"
     log "SETUP" "Directory structure ready."
@@ -105,6 +106,11 @@ validate_environment() {
                 command -v "${GATK_BIN}"       &>/dev/null \
                     && log "VALIDATE" "GATK      : found ($(command -v "${GATK_BIN}"))" \
                     || warn "VALIDATE" "GATK      : NOT FOUND — ${GATK_BIN} (will skip)"
+                ;;
+            gatk_genomicsdb)
+                command -v "${GATK_BIN}"       &>/dev/null \
+                    && log "VALIDATE" "GATK GDB  : found ($(command -v "${GATK_BIN}"))" \
+                    || warn "VALIDATE" "GATK GDB  : NOT FOUND — ${GATK_BIN} (will skip)"
                 ;;
         esac
     done

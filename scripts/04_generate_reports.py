@@ -97,9 +97,19 @@ def find_inflections(x_vals, y_vals, rel_threshold=0.5):
 # ─── Data loading ─────────────────────────────────────────────────────────────
 
 
-SOFTWARES  = ["glnexus", "parabricks", "gatk"]
-SOFT_LABEL = {"glnexus": "GLnexus", "parabricks": "Parabricks", "gatk": "GATK"}
-SOFT_COLOR = {"glnexus": "#1f77b4", "parabricks": "#ff7f0e", "gatk": "#2ca02c"}
+SOFTWARES  = ["glnexus", "parabricks", "gatk", "gatk_genomicsdb"]
+SOFT_LABEL = {
+    "glnexus":        "GLnexus",
+    "parabricks":     "Parabricks",
+    "gatk":           "GATK (CombineGVCFs)",
+    "gatk_genomicsdb": "GATK (GenomicsDB)",
+}
+SOFT_COLOR = {
+    "glnexus":        "#1f77b4",
+    "parabricks":     "#ff7f0e",
+    "gatk":           "#2ca02c",
+    "gatk_genomicsdb": "#9467bd",
+}
 
 METRICS = {
     "wall_time_s":          "Wall Time (s)",
@@ -817,8 +827,8 @@ def generate_html(
     overlap_data:  dict | None = None,
 ):
     cmp_html,   cmp_js   = build_comparison_tab(data)
-    sw_tabs = {}
-    sw_js   = {}
+    sw_tabs: dict[str, str] = {}
+    sw_js:   dict[str, str] = {}
     for sw in SOFTWARES:
         sw_tabs[sw], sw_js[sw] = build_software_tab(sw, data)
     raw_html = build_rawdata_tab(data)
@@ -887,7 +897,8 @@ def generate_html(
   <button class="tab-btn active" onclick="showTab('tab-cmp',this)">Overview</button>
   <button class="tab-btn" onclick="showTab('tab-glnexus',this)">GLnexus</button>
   <button class="tab-btn" onclick="showTab('tab-parabricks',this)">Parabricks</button>
-  <button class="tab-btn" onclick="showTab('tab-gatk',this)">GATK</button>
+  <button class="tab-btn" onclick="showTab('tab-gatk',this)">GATK CombineGVCFs</button>
+  <button class="tab-btn" onclick="showTab('tab-gatk_genomicsdb',this)">GATK GenomicsDB</button>
   <button class="tab-btn" onclick="showTab('tab-variants',this)">Variant Analysis</button>
   <button class="tab-btn" onclick="showTab('tab-raw',this)">Raw Data</button>
 </div>
@@ -906,6 +917,10 @@ def generate_html(
 
 <div id="tab-gatk" class="tab-content">
 {sw_tabs.get('gatk','')}
+</div>
+
+<div id="tab-gatk_genomicsdb" class="tab-content">
+{sw_tabs.get('gatk_genomicsdb','')}
 </div>
 
 <div id="tab-variants" class="tab-content">
@@ -931,6 +946,7 @@ def generate_html(
   {sw_js.get('glnexus','')}
   {sw_js.get('parabricks','')}
   {sw_js.get('gatk','')}
+  {sw_js.get('gatk_genomicsdb','')}
   // Variant analysis tab
   {var_js}
 }})();

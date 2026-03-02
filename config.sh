@@ -37,6 +37,16 @@ GATK_JAVA_OPTS="${GATK_JAVA_OPTS:--Xmx160g -XX:+UseParallelGC}"
 # gatk wrapper path
 GATK_BIN="${GATK_BIN:-gatk}"
 
+# ─── GATK GenomicsDBImport ────────────────────────────────────────────────────
+# Optional: path to an intervals file (BED or .list) for GenomicsDBImport.
+# If empty, main chromosomes (chr[0-9]+, chrX, chrY, chrM) are auto-detected
+# from ${REF_GENOME}.fai.  For WES set this to your capture-kit BED.
+GENOMICSDB_INTERVALS="${GENOMICSDB_INTERVALS:-}"
+# Parallel reader threads for GenomicsDBImport (default 4)
+GENOMICSDB_READER_THREADS="${GENOMICSDB_READER_THREADS:-4}"
+# Batch size for GenomicsDBImport (reduce below 50 if you hit OOM)
+GENOMICSDB_BATCH_SIZE="${GENOMICSDB_BATCH_SIZE:-50}"
+
 # ─── Benchmark Control ────────────────────────────────────────────────────────
 # Sizes (number of GVCFs per dataset run)
 DATASET_SIZES=(10 20 30 40 50 60 70 80 90 100)
@@ -45,7 +55,7 @@ RANDOM_SEED="${RANDOM_SEED:-42}"
 # Resource-monitor sampling interval (seconds)
 MONITOR_INTERVAL="${MONITOR_INTERVAL:-5}"
 # Which softwares to benchmark — comment out any to skip
-BENCHMARK_SOFTWARES=("glnexus" "parabricks" "gatk")
+BENCHMARK_SOFTWARES=("glnexus" "parabricks" "gatk" "gatk_genomicsdb")
 
 # ─── Paths (derived; normally no need to change) ──────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
