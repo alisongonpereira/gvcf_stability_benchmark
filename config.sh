@@ -8,6 +8,12 @@
 # File must have a .fai index and a .dict sequence dictionary.
 REF_GENOME="/home/alisongonpereira/raid/largefiles/hg38_fasta/Homo_sapiens_assembly38.fasta"
 
+# ─── Resource limits (80% of 128-core / 504G server) ─────────────────────────
+# Adjust if running on a different machine.
+# 80% of 128 cores = 102 | 80% of 504G RAM = ~400G
+BENCHMARK_THREADS="${BENCHMARK_THREADS:-102}"
+BENCHMARK_MEM_GB="${BENCHMARK_MEM_GB:-400}"
+
 
 # jemalloc dramatically speeds up GLnexus's allocator-heavy workload.
 # IMPORTANT: scripts/02_run_gatk.sh uses `env -u LD_PRELOAD` before every
@@ -20,6 +26,12 @@ export LD_PRELOAD="${CONDA_PREFIX}/lib/libjemalloc.so:${LD_PRELOAD:-}"
 GLNEXUS_CONFIG="${GLNEXUS_CONFIG:-DeepVariantWES}"
 # Path to glnexus_cli (leave as-is if it is in PATH)
 GLNEXUS_BIN="${GLNEXUS_BIN:-glnexus_cli}"
+# Worker threads for glnexus_cli (default: all available → pin to 80%)
+GLNEXUS_THREADS="${GLNEXUS_THREADS:-${BENCHMARK_THREADS}}"
+# Memory budget in GiB passed to glnexus_cli (0 = unlimited)
+GLNEXUS_MEM_GB="${GLNEXUS_MEM_GB:-${BENCHMARK_MEM_GB}}"
+# Threads for the bcftools view BCF→VCF pipe
+BCFTOOLS_THREADS="${BCFTOOLS_THREADS:-${BENCHMARK_THREADS}}"
 
 # ─── NVIDIA Parabricks ────────────────────────────────────────────────────────
 # GPU device(s) to use, e.g. "0" for the first A100
@@ -31,9 +43,8 @@ PARABRICKS_DOCKER_IMAGE="${PARABRICKS_DOCKER_IMAGE:-nvcr.io/nvidia/clara/clara-p
 PARABRICKS_BIN="${PARABRICKS_BIN:-docker run --rm --gpus \"device=${PARABRICKS_GPU}\" -v /nfs/theseus:/nfs/theseus -v ${HOME}:${HOME} -w ${PWD} ${PARABRICKS_DOCKER_IMAGE} pbrun}"
 
 # ─── GATK ─────────────────────────────────────────────────────────────────────
-# Java options — tune heap based on available RAM
-# 160g for your beefy node; if you ever hit OOM, drop to 96g or 64g.
-GATK_JAVA_OPTS="${GATK_JAVA_OPTS:--Xmx160g -XX:+UseParallelGC}"
+# Java heap = 80% of RAM; ParallelGC uses 80% of CPU cores for GC.
+GATK_JAVA_OPTS="${GATK_JAVA_OPTS:--Xmx${BENCHMARK_MEM_GB}g -XX:+UseParallelGC -XX:ParallelGCThreads=${BENCHMARK_THREADS}}"
 # gatk wrapper path
 GATK_BIN="${GATK_BIN:-gatk}"
 
@@ -42,8 +53,8 @@ GATK_BIN="${GATK_BIN:-gatk}"
 # If empty, main chromosomes (chr[0-9]+, chrX, chrY, chrM) are auto-detected
 # from ${REF_GENOME}.fai.  For WES set this to your capture-kit BED.
 GENOMICSDB_INTERVALS="${GENOMICSDB_INTERVALS:-}"
-# Parallel reader threads for GenomicsDBImport (default 4)
-GENOMICSDB_READER_THREADS="${GENOMICSDB_READER_THREADS:-4}"
+# Parallel reader threads for GenomicsDBImport — feed all 80% cores
+GENOMICSDB_READER_THREADS="${GENOMICSDB_READER_THREADS:-${BENCHMARK_THREADS}}"
 # Batch size for GenomicsDBImport (reduce below 50 if you hit OOM)
 GENOMICSDB_BATCH_SIZE="${GENOMICSDB_BATCH_SIZE:-50}"
 
