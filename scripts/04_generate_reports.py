@@ -22,10 +22,10 @@ from datetime import datetime
 from pathlib import Path
 
 # Optional — Excel support
+# NOTE: import openpyxl under env -u LD_PRELOAD; lxml (pulled by openpyxl)
+# is a C extension that segfaults when libjemalloc is preloaded via LD_PRELOAD.
 try:
     import openpyxl
-    from openpyxl.chart import LineChart, Reference
-    from openpyxl.chart.series import SeriesLabel
     from openpyxl.styles import (
         Alignment, Border, Font, PatternFill, Side
     )
@@ -473,7 +473,19 @@ def build_rawdata_tab(data: dict) -> str:
     return "\n".join(html)
 
 
-def generate_html(data: dict, output_path: Path):
+def _render_caveats(caveats: list[str] | None) -> str:
+    if not caveats:
+        return ""
+    items = "".join(f"<li>{c}</li>" for c in caveats)
+    return (
+        '<div style="background:#fff3cd;border-left:4px solid #ffc107;'
+        'padding:12px 24px;margin:0 32px 16px;border-radius:4px">'
+        '<strong>⚠ Data quality notes:</strong><ul style="margin:6px 0 0 16px">'
+        f"{items}</ul></div>"
+    )
+
+
+def generate_html(data: dict, output_path: Path, caveats: list[str] | None = None):
     cmp_html,   cmp_js   = build_comparison_tab(data)
     sw_tabs = {}
     sw_js   = {}
@@ -536,6 +548,7 @@ def generate_html(data: dict, output_path: Path):
   </div>
 </div>
 
+{_render_caveats(caveats)}
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('tab-cmp',this)">Overview</button>
   <button class="tab-btn" onclick="showTab('tab-glnexus',this)">GLnexus</button>
@@ -586,7 +599,6 @@ def generate_html(data: dict, output_path: Path):
 </html>"""
 
     output_path.write_text(html, encoding="utf-8")
-    print(f"[REPORT] HTML written: {output_path}")
 
 
 # ─── Excel report ─────────────────────────────────────────────────────────────
@@ -723,6 +735,38 @@ def generate_excel(data: dict, output_path: Path):
     print(f"[REPORT] Excel written: {output_path}")
 
 
+# ─── Caveats ──────────────────────────────────────────────────────────────────
+
+def _collect_caveats(data: dict) -> list[str]:
+    """
+    Return human-readable warnings about data quality issues, e.g. when the
+    monitoring interval (5 s) is larger than the measured wall time, meaning
+    peak GPU/CPU values were almost certainly not captured.
+    """
+    caveats = []
+    MONITOR_INTERVAL_S = 5   # matches config.sh MONITOR_INTERVAL default
+    COARSE_THRESHOLD   = 3   # flag if wall_time < THRESHOLD × interval
+
+    for sw, size_dict in data.items():
+        coarse_sizes = []
+        for size, rec in size_dict.items():
+            if rec.get("status") != "success":
+                continue
+            wt = rec.get("wall_time_s", 0)
+            if wt < MONITOR_INTERVAL_S * COARSE_THRESHOLD:
+                coarse_sizes.append((size, wt))
+        if coarse_sizes:
+            sizes_str = ", ".join(
+                f"N={s} ({wt:.0f}s)" for s, wt in sorted(coarse_sizes)
+            )
+            caveats.append(
+                f"{SOFT_LABEL.get(sw, sw)}: execution faster than {COARSE_THRESHOLD}× "
+                f"monitor interval ({MONITOR_INTERVAL_S}s) — GPU/CPU peaks unreliable "
+                f"for {sizes_str}"
+            )
+    return caveats
+
+
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
@@ -747,11 +791,30 @@ def main():
     if total == 0:
         print("[WARN] No metrics found — reports will be empty but will still be created")
 
+    # Detect runs where the monitoring interval is too coarse relative to
+    # the wall time (< 3× the interval), meaning peak resource values were
+    # likely missed entirely.
+    caveats = _collect_caveats(data)
+    if caveats:
+        print("[WARN] Coarse-monitoring caveats detected (GPU/CPU peaks may be 0):")
+        for c in caveats:
+            print(f"       {c}")
+
     html_path  = output_dir / "benchmark_report.html"
     excel_path = output_dir / "benchmark_data.xlsx"
 
-    generate_html(data,  html_path)
-    generate_excel(data, excel_path)
+    try:
+        generate_html(data, html_path, caveats)
+        print(f"[REPORT] HTML written: {html_path}")
+    except Exception as exc:
+        print(f"[ERROR] HTML generation failed: {exc}", file=sys.stderr)
+        import traceback; traceback.print_exc()
+
+    try:
+        generate_excel(data, excel_path)
+    except Exception as exc:
+        print(f"[ERROR] Excel generation failed: {exc}", file=sys.stderr)
+        import traceback; traceback.print_exc()
 
     print("[REPORT] Done.")
 

@@ -174,7 +174,9 @@ run_software() {
 run_reports() {
     log "REPORT" "=== Step 3: Generating Reports ==="
 
-    python3 "${SCRIPTS_DIR}/04_generate_reports.py" \
+    # env -u LD_PRELOAD: same libjemalloc + C-extension conflict that kills
+    # GATK also affects openpyxl (via lxml) when generating the Excel file.
+    env -u LD_PRELOAD python3 "${SCRIPTS_DIR}/04_generate_reports.py" \
         --benchmark-dir "${BENCHMARK_DIR}" \
         --output-dir    "${BENCHMARK_DIR}/04_reports"
 
