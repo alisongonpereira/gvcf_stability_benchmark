@@ -75,6 +75,9 @@ run_size() {
     gvcf_count=$(wc -l < "${manifest}")
     log "GATK" "[dataset_${size}] Starting — ${gvcf_count} GVCFs"
 
+    # Clean up any leftover intermediate files from a previous failed run
+    rm -f "${combined_gvcf}" "${combined_gvcf}.tbi"
+
     # Ensure bgzipped + indexed (GATK requires .tbi)
     local v_args=()
     while IFS= read -r gvcf; do
@@ -95,30 +98,34 @@ run_size() {
     local exit_code=0
 
     # ── Step A: CombineGVCFs ─────────────────────────────────────────────────
+    # NOTE: LD_PRELOAD (set in config.sh for GLnexus/jemalloc) must be unset
+    # before invoking the JVM — libjemalloc conflicts with Java's allocator
+    # and causes an immediate SIGSEGV (exit 245).  We use `env -u LD_PRELOAD`
+    # so the parent shell's LD_PRELOAD is unaffected.
     log "GATK" "[dataset_${size}] Step A: CombineGVCFs..."
-    "${GATK_BIN}" --java-options "${GATK_JAVA_OPTS}" \
+    env -u LD_PRELOAD "${GATK_BIN}" --java-options "${GATK_JAVA_OPTS}" \
         CombineGVCFs \
         -R "${REF_GENOME}" \
         "${v_args[@]}" \
         -O "${combined_gvcf}" \
         --tmp-dir "${tmp_dir}" \
-        2>>"${stderr_log}" \
+        >> "${stderr_log}" 2>&1 \
     || exit_code=$?
 
     if [[ "${exit_code}" -ne 0 ]]; then
-        warn "GATK" "[dataset_${size}] CombineGVCFs failed (exit_code=${exit_code})"
+        warn "GATK" "[dataset_${size}] CombineGVCFs failed (exit_code=${exit_code}) — see ${stderr_log}"
     fi
 
     # ── Step B: GenotypeGVCFs ────────────────────────────────────────────────
     if [[ "${exit_code}" -eq 0 ]]; then
         log "GATK" "[dataset_${size}] Step B: GenotypeGVCFs..."
-        "${GATK_BIN}" --java-options "${GATK_JAVA_OPTS}" \
+        env -u LD_PRELOAD "${GATK_BIN}" --java-options "${GATK_JAVA_OPTS}" \
             GenotypeGVCFs \
             -R "${REF_GENOME}" \
             -V "${combined_gvcf}" \
             -O "${output_vcf}" \
             --tmp-dir "${tmp_dir}" \
-            2>>"${stderr_log}" \
+            >> "${stderr_log}" 2>&1 \
         || exit_code=$?
     fi
 

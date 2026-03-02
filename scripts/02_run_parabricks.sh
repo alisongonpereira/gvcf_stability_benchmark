@@ -41,9 +41,9 @@ check_prerequisites() {
         exit 0
     fi
 
-    log "PARABRICKS" "Using: $(command -v ${PARABRICKS_BIN})"
+    log "PARABRICKS" "Using docker image: ${PARABRICKS_DOCKER_IMAGE}"
     log "PARABRICKS" "Reference: ${REF_GENOME}"
-    log "PARABRICKS" "GPU device: ${PARABRICKS_GPU}"
+    log "PARABRICKS" "GPU device: ${PARABRICKS_GPU_DEVICES}"
 
     if command -v nvidia-smi &>/dev/null; then
         local gpu_name
