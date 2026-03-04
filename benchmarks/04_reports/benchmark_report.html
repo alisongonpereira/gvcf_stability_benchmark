@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GVCF Scalability Benchmark Report</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+  <style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f7fa; color: #333; }
+header { background: #1a1a2e; color: #eee; padding: 24px 32px; }
+header h1 { font-size: 1.6rem; font-weight: 600; }
+header p  { font-size: 0.85rem; color: #aaa; margin-top: 4px; }
+.tabs { display: flex; gap: 4px; padding: 16px 32px 0; background: #fff;
+        border-bottom: 2px solid #e0e0e0; }
+.tab-btn { padding: 8px 18px; border: none; border-radius: 6px 6px 0 0;
+           cursor: pointer; background: #e8ecf0; color: #555; font-size: 0.9rem;
+           transition: background 0.2s; }
+.tab-btn.active { background: #1a1a2e; color: #fff; }
+.tab-btn:hover:not(.active) { background: #d0d6de; }
+.tab-content { display: none; padding: 24px 32px; }
+.tab-content.active { display: block; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.card  { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.08);
+         padding: 16px; }
+.card h3 { font-size: 0.95rem; color: #555; margin-bottom: 8px; }
+.section-title { font-size: 1.1rem; font-weight: 600; margin: 20px 0 12px; color: #1a1a2e; }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+th { background: #1a1a2e; color: #fff; padding: 8px 12px; text-align: left; }
+td { padding: 7px 12px; border-bottom: 1px solid #eee; }
+tr:nth-child(even) td { background: #f9f9f9; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px;
+         font-size: 0.75rem; font-weight: 600; }
+.badge-success { background: #d4edda; color: #155724; }
+.badge-failed  { background: #f8d7da; color: #721c24; }
+.badge-skipped { background: #fff3cd; color: #856404; }
+.stat { text-align: center; }
+.stat .val { font-size: 1.4rem; font-weight: 700; color: #1a1a2e; }
+.stat .lbl { font-size: 0.75rem; color: #888; margin-top: 2px; }
+@media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>GVCF Scalability Benchmark Report</h1>
+  <p>Generated: 2026-03-04 13:42:14 &nbsp;|&nbsp;
+     Tools: GLnexus, NVIDIA CLARA Parabricks, GATK &nbsp;|&nbsp;
+     Dataset sizes: 10, 25, 50, 75, 100 GVCFs (3 replicates)</p>
+</header>
+
+<!-- Summary cards -->
+<div style="display:flex;gap:16px;padding:20px 32px;background:#fff;border-bottom:1px solid #eee;flex-wrap:wrap">
+  <div class="card stat" style="flex:1;min-width:120px">
+    <div class="val">30</div><div class="lbl">Total runs</div>
+  </div>
+  <div class="card stat" style="flex:1;min-width:120px">
+    <div class="val">20</div><div class="lbl">Successful</div>
+  </div>
+  <div class="card stat" style="flex:1;min-width:120px">
+    <div class="val">10</div><div class="lbl">Failed / skipped</div>
+  </div>
+  <div class="card stat" style="flex:1;min-width:120px">
+    <div class="val">1.23h</div><div class="lbl">Total compute time</div>
+  </div>
+  <div class="card stat" style="flex:1;min-width:120px">
+    <div class="val">65,221,075</div><div class="lbl">Total variants called</div>
+  </div>
+</div>
+
+<div style="background:#fff3cd;border-left:4px solid #ffc107;padding:12px 24px;margin:0 32px 16px;border-radius:4px"><strong>⚠ Data quality notes:</strong><ul style="margin:6px 0 0 16px"><li>Parabricks: execution faster than 3× monitor interval (5s) — GPU/CPU peaks unreliable for N=10 (8s), N=20 (8s), N=30 (6s), N=40 (7s), N=50 (8s), N=60 (9s), N=70 (7s), N=80 (8s), N=90 (8s), N=100 (8s)</li></ul></div>
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('tab-cmp',this)">Overview</button>
+  <button class="tab-btn" onclick="showTab('tab-glnexus',this)">GLnexus</button>
+  <button class="tab-btn" onclick="showTab('tab-parabricks',this)">Parabricks</button>
+  <button class="tab-btn" onclick="showTab('tab-gatk',this)">GATK CombineGVCFs</button>
+  <button class="tab-btn" onclick="showTab('tab-gatk_genomicsdb',this)">GATK GenomicsDB</button>
+  <button class="tab-btn" onclick="showTab('tab-variants',this)">Variant Analysis</button>
+  <button class="tab-btn" onclick="showTab('tab-extrap',this)">Extrapolação</button>
+  <button class="tab-btn" onclick="showTab('tab-raw',this)">Raw Data</button>
+</div>
+
+<div id="tab-cmp" class="tab-content active">
+<div class="section-title">Side-by-side comparison — all softwares</div>
+<div class="grid-3">
+<div class="card"><div id="chart_cmp_0" style="height:280px"></div></div>
+<div class="card"><div id="chart_cmp_1" style="height:280px"></div></div>
+<div class="card"><div id="chart_cmp_2" style="height:280px"></div></div>
+</div>
+<div class="grid-3">
+<div class="card"><div id="chart_cmp_3" style="height:280px"></div></div>
+<div class="card"><div id="chart_cmp_4" style="height:280px"></div></div>
+<div class="card"><div id="chart_cmp_5" style="height:280px"></div></div>
+</div>
+<div class="grid-3">
+<div class="card"><div id="chart_cmp_6" style="height:280px"></div></div>
+<div class="card"><div id="chart_cmp_7" style="height:280px"></div></div>
+<div class="card"><div id="chart_cmp_8" style="height:280px"></div></div>
+</div>
+<div class="section-title">Scalability Analysis (R² — linear fit)</div>
+<div class="card"><table>
+<tr><th>Metric</th><th>GLnexus</th><th>Parabricks</th><th>GATK (CombineGVCFs)</th><th>GATK (GenomicsDB)</th></tr>
+<tr><td>Wall Time (s)</td><td style="color:#2ca02c;font-weight:600">0.9697</td><td style="color:#d62728;font-weight:600">0.0601</td><td>—</td><td>—</td></tr>
+<tr><td>CPU avg (%)</td><td style="color:#d62728;font-weight:600">0.6582</td><td style="color:#d62728;font-weight:600">0.0493</td><td>—</td><td>—</td></tr>
+<tr><td>CPU peak (%)</td><td style="color:#d62728;font-weight:600">0.7045</td><td style="color:#d62728;font-weight:600">0.0514</td><td>—</td><td>—</td></tr>
+<tr><td>GPU util avg (%)</td><td style="color:#d62728;font-weight:600">0.0296</td><td style="color:#2ca02c;font-weight:600">1.0000</td><td>—</td><td>—</td></tr>
+<tr><td>GPU util peak (%)</td><td style="color:#d62728;font-weight:600">0.0331</td><td style="color:#2ca02c;font-weight:600">1.0000</td><td>—</td><td>—</td></tr>
+<tr><td>GPU Mem peak (MB)</td><td style="color:#d62728;font-weight:600">0.0303</td><td style="color:#d62728;font-weight:600">0.6364</td><td>—</td><td>—</td></tr>
+<tr><td>RAM avg (GB)</td><td style="color:#ff7f0e;font-weight:600">0.8347</td><td style="color:#d62728;font-weight:600">0.6564</td><td>—</td><td>—</td></tr>
+<tr><td>RAM peak (GB)</td><td style="color:#d62728;font-weight:600">0.6516</td><td style="color:#d62728;font-weight:600">0.6300</td><td>—</td><td>—</td></tr>
+<tr><td>Disk peak (GB)</td><td style="color:#d62728;font-weight:600">0.3137</td><td style="color:#d62728;font-weight:600">0.7484</td><td>—</td><td>—</td></tr>
+</table></div>
+</div>
+
+<div id="tab-glnexus" class="tab-content">
+<div class="section-title">GLnexus — Scalability Metrics</div>
+<div class="grid-3">
+<div class="card"><div id="chart_glnexus_wall_time_s" style="height:260px"></div></div>
+<div class="card"><div id="chart_glnexus_cpu_pct_avg" style="height:260px"></div></div>
+<div class="card"><div id="chart_glnexus_gpu_util_pct_avg" style="height:260px"></div></div>
+<div class="card"><div id="chart_glnexus_ram_used_gb_avg" style="height:260px"></div></div>
+<div class="card"><div id="chart_glnexus_gpu_mem_used_mb_max" style="height:260px"></div></div>
+<div class="card"><div id="chart_glnexus_disk_used_gb_max" style="height:260px"></div></div>
+</div>
+<div class="section-title">Detected Inflection Points</div>
+<div class="card"><table>
+<tr><th>Metric</th><th>Dataset Size</th><th>Slope Before</th><th>Slope After</th></tr>
+<tr><td>Wall Time (s)</td><td>50</td><td>7.4000</td><td>14.9000</td></tr>
+<tr><td>Wall Time (s)</td><td>60</td><td>14.9000</td><td>6.1000</td></tr>
+<tr><td>Wall Time (s)</td><td>70</td><td>6.1000</td><td>-0.6000</td></tr>
+<tr><td>Wall Time (s)</td><td>80</td><td>-0.6000</td><td>5.4000</td></tr>
+<tr><td>CPU avg (%)</td><td>50</td><td>0.2442</td><td>1.5797</td></tr>
+<tr><td>CPU avg (%)</td><td>60</td><td>1.5797</td><td>0.0430</td></tr>
+<tr><td>CPU avg (%)</td><td>70</td><td>0.0430</td><td>-1.0559</td></tr>
+<tr><td>CPU avg (%)</td><td>80</td><td>-1.0559</td><td>0.2010</td></tr>
+<tr><td>GPU util avg (%)</td><td>50</td><td>0.0000</td><td>2.7916</td></tr>
+<tr><td>GPU util avg (%)</td><td>60</td><td>2.7916</td><td>-0.1219</td></tr>
+<tr><td>GPU util avg (%)</td><td>70</td><td>-0.1219</td><td>-2.6689</td></tr>
+<tr><td>GPU util avg (%)</td><td>80</td><td>-2.6689</td><td>-0.0008</td></tr>
+<tr><td>RAM avg (GB)</td><td>50</td><td>0.7488</td><td>3.3793</td></tr>
+<tr><td>RAM avg (GB)</td><td>60</td><td>3.3793</td><td>0.6150</td></tr>
+<tr><td>RAM avg (GB)</td><td>70</td><td>0.6150</td><td>-1.7307</td></tr>
+<tr><td>RAM avg (GB)</td><td>80</td><td>-1.7307</td><td>0.6843</td></tr>
+<tr><td>GPU Mem peak (MB)</td><td>50</td><td>0.0000</td><td>3860.4000</td></tr>
+<tr><td>GPU Mem peak (MB)</td><td>60</td><td>3860.4000</td><td>0.0000</td></tr>
+<tr><td>GPU Mem peak (MB)</td><td>70</td><td>0.0000</td><td>-3860.4000</td></tr>
+<tr><td>GPU Mem peak (MB)</td><td>80</td><td>-3860.4000</td><td>0.0000</td></tr>
+<tr><td>Disk peak (GB)</td><td>50</td><td>0.1312</td><td>2.1943</td></tr>
+<tr><td>Disk peak (GB)</td><td>60</td><td>2.1943</td><td>0.0970</td></tr>
+<tr><td>Disk peak (GB)</td><td>70</td><td>0.0970</td><td>-1.8610</td></tr>
+<tr><td>Disk peak (GB)</td><td>80</td><td>-1.8610</td><td>0.1353</td></tr>
+</table></div>
+<div class="section-title">GLnexus — Run Details</div>
+<div class="card" style="overflow-x:auto"><table>
+<tr><th>Size</th><th>Rep</th><th>Status</th><th>Wall Time (s)</th><th>CPU avg%</th><th>GPU util%</th><th>RAM avg GB</th><th>Variants</th></tr>
+<tr><td>10</td><td>1</td><td><span class="badge badge-success">success</span></td><td>104.0</td><td>18.67</td><td>0.00</td><td>76.54</td><td>1734223</td></tr>
+<tr><td>20</td><td>1</td><td><span class="badge badge-success">success</span></td><td>177.0</td><td>23.17</td><td>0.03</td><td>84.37</td><td>3087313</td></tr>
+<tr><td>30</td><td>1</td><td><span class="badge badge-success">success</span></td><td>248.0</td><td>26.95</td><td>0.00</td><td>93.47</td><td>4057032</td></tr>
+<tr><td>40</td><td>1</td><td><span class="badge badge-success">success</span></td><td>321.0</td><td>29.16</td><td>0.00</td><td>100.70</td><td>5047488</td></tr>
+<tr><td>50</td><td>1</td><td><span class="badge badge-success">success</span></td><td>395.0</td><td>31.61</td><td>0.00</td><td>108.19</td><td>6048061</td></tr>
+<tr><td>60</td><td>1</td><td><span class="badge badge-success">success</span></td><td>544.0</td><td>47.40</td><td>27.92</td><td>141.98</td><td>6890455</td></tr>
+<tr><td>70</td><td>1</td><td><span class="badge badge-success">success</span></td><td>605.0</td><td>47.83</td><td>26.70</td><td>148.13</td><td>7461015</td></tr>
+<tr><td>80</td><td>1</td><td><span class="badge badge-success">success</span></td><td>599.0</td><td>37.27</td><td>0.01</td><td>130.82</td><td>8436228</td></tr>
+<tr><td>90</td><td>1</td><td><span class="badge badge-success">success</span></td><td>653.0</td><td>39.28</td><td>0.00</td><td>137.67</td><td>9197941</td></tr>
+<tr><td>100</td><td>1</td><td><span class="badge badge-success">success</span></td><td>712.0</td><td>41.41</td><td>0.01</td><td>143.66</td><td>10030297</td></tr>
+</table></div>
+</div>
+
+<div id="tab-parabricks" class="tab-content">
+<div class="section-title">Parabricks — Scalability Metrics</div>
+<div class="grid-3">
+<div class="card"><div id="chart_parabricks_wall_time_s" style="height:260px"></div></div>
+<div class="card"><div id="chart_parabricks_cpu_pct_avg" style="height:260px"></div></div>
+<div class="card"><div id="chart_parabricks_gpu_util_pct_avg" style="height:260px"></div></div>
+<div class="card"><div id="chart_parabricks_ram_used_gb_avg" style="height:260px"></div></div>
+<div class="card"><div id="chart_parabricks_gpu_mem_used_mb_max" style="height:260px"></div></div>
+<div class="card"><div id="chart_parabricks_disk_used_gb_max" style="height:260px"></div></div>
+</div>
+<div class="section-title">Detected Inflection Points</div>
+<div class="card"><table>
+<tr><th>Metric</th><th>Dataset Size</th><th>Slope Before</th><th>Slope After</th></tr>
+<tr><td>Wall Time (s)</td><td>20</td><td>0.0000</td><td>-0.2000</td></tr>
+<tr><td>Wall Time (s)</td><td>30</td><td>-0.2000</td><td>0.1000</td></tr>
+<tr><td>Wall Time (s)</td><td>60</td><td>0.1000</td><td>-0.2000</td></tr>
+<tr><td>Wall Time (s)</td><td>70</td><td>-0.2000</td><td>0.1000</td></tr>
+<tr><td>Wall Time (s)</td><td>80</td><td>0.1000</td><td>0.0000</td></tr>
+<tr><td>CPU avg (%)</td><td>20</td><td>4.9200</td><td>-4.1750</td></tr>
+<tr><td>CPU avg (%)</td><td>30</td><td>-4.1750</td><td>-0.8100</td></tr>
+<tr><td>CPU avg (%)</td><td>40</td><td>-0.8100</td><td>5.4000</td></tr>
+<tr><td>CPU avg (%)</td><td>50</td><td>5.4000</td><td>-4.9500</td></tr>
+<tr><td>CPU avg (%)</td><td>60</td><td>-4.9500</td><td>-0.0200</td></tr>
+<tr><td>CPU avg (%)</td><td>90</td><td>1.5300</td><td>3.9100</td></tr>
+<tr><td>RAM avg (GB)</td><td>70</td><td>0.3486</td><td>1.0979</td></tr>
+<tr><td>RAM avg (GB)</td><td>80</td><td>1.0979</td><td>3.3281</td></tr>
+<tr><td>RAM avg (GB)</td><td>90</td><td>3.3281</td><td>-3.6664</td></tr>
+<tr><td>GPU Mem peak (MB)</td><td>70</td><td>0.0000</td><td>0.4000</td></tr>
+<tr><td>GPU Mem peak (MB)</td><td>80</td><td>0.4000</td><td>0.0000</td></tr>
+<tr><td>Disk peak (GB)</td><td>60</td><td>0.0000</td><td>0.0719</td></tr>
+<tr><td>Disk peak (GB)</td><td>70</td><td>0.0719</td><td>0.0113</td></tr>
+<tr><td>Disk peak (GB)</td><td>80</td><td>0.0113</td><td>0.0000</td></tr>
+</table></div>
+<div class="section-title">Parabricks — Run Details</div>
+<div class="card" style="overflow-x:auto"><table>
+<tr><th>Size</th><th>Rep</th><th>Status</th><th>Wall Time (s)</th><th>CPU avg%</th><th>GPU util%</th><th>RAM avg GB</th><th>Variants</th></tr>
+<tr><td>10</td><td>1</td><td><span class="badge badge-success">success</span></td><td>8.0</td><td>33.65</td><td>0.00</td><td>113.28</td><td>287497</td></tr>
+<tr><td>20</td><td>1</td><td><span class="badge badge-success">success</span></td><td>8.0</td><td>82.85</td><td>0.00</td><td>116.22</td><td>287497</td></tr>
+<tr><td>30</td><td>1</td><td><span class="badge badge-success">success</span></td><td>6.0</td><td>41.10</td><td>0.00</td><td>119.29</td><td>287312</td></tr>
+<tr><td>40</td><td>1</td><td><span class="badge badge-success">success</span></td><td>7.0</td><td>33.00</td><td>0.00</td><td>122.14</td><td>338388</td></tr>
+<tr><td>50</td><td>1</td><td><span class="badge badge-success">success</span></td><td>8.0</td><td>87.00</td><td>0.00</td><td>125.44</td><td>338388</td></tr>
+<tr><td>60</td><td>1</td><td><span class="badge badge-success">success</span></td><td>9.0</td><td>37.50</td><td>0.00</td><td>129.03</td><td>338388</td></tr>
+<tr><td>70</td><td>1</td><td><span class="badge badge-success">success</span></td><td>7.0</td><td>37.30</td><td>0.00</td><td>132.51</td><td>338388</td></tr>
+<tr><td>80</td><td>1</td><td><span class="badge badge-success">success</span></td><td>8.0</td><td>39.10</td><td>0.00</td><td>143.49</td><td>338388</td></tr>
+<tr><td>90</td><td>1</td><td><span class="badge badge-success">success</span></td><td>8.0</td><td>54.40</td><td>0.00</td><td>176.77</td><td>338388</td></tr>
+<tr><td>100</td><td>1</td><td><span class="badge badge-success">success</span></td><td>8.0</td><td>93.50</td><td>0.00</td><td>140.11</td><td>338388</td></tr>
+</table></div>
+</div>
+
+<div id="tab-gatk" class="tab-content">
+<div class="section-title">GATK (CombineGVCFs) — Scalability Metrics</div>
+<div class="grid-3">
+<div class="card"><div id="chart_gatk_wall_time_s" style="height:260px"></div></div>
+<div class="card"><div id="chart_gatk_cpu_pct_avg" style="height:260px"></div></div>
+<div class="card"><div id="chart_gatk_gpu_util_pct_avg" style="height:260px"></div></div>
+<div class="card"><div id="chart_gatk_ram_used_gb_avg" style="height:260px"></div></div>
+<div class="card"><div id="chart_gatk_gpu_mem_used_mb_max" style="height:260px"></div></div>
+<div class="card"><div id="chart_gatk_disk_used_gb_max" style="height:260px"></div></div>
+</div>
+<div class="section-title">GATK (CombineGVCFs) — Run Details</div>
+<div class="card" style="overflow-x:auto"><table>
+<tr><th>Size</th><th>Rep</th><th>Status</th><th>Wall Time (s)</th><th>CPU avg%</th><th>GPU util%</th><th>RAM avg GB</th><th>Variants</th></tr>
+<tr><td>10</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>3.0</td><td>0.00</td><td>0.00</td><td>66.73</td><td>0</td></tr>
+<tr><td>20</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.0</td><td>14.30</td><td>0.00</td><td>66.82</td><td>0</td></tr>
+<tr><td>30</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.0</td><td>0.00</td><td>0.00</td><td>66.86</td><td>0</td></tr>
+<tr><td>40</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.0</td><td>12.50</td><td>0.00</td><td>66.95</td><td>0</td></tr>
+<tr><td>50</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>2.0</td><td>0.00</td><td>0.00</td><td>66.87</td><td>0</td></tr>
+<tr><td>60</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.0</td><td>0.00</td><td>0.00</td><td>66.82</td><td>0</td></tr>
+<tr><td>70</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.0</td><td>0.00</td><td>0.00</td><td>66.82</td><td>0</td></tr>
+<tr><td>80</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.0</td><td>12.50</td><td>0.00</td><td>66.79</td><td>0</td></tr>
+<tr><td>90</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.0</td><td>0.00</td><td>0.00</td><td>66.80</td><td>0</td></tr>
+<tr><td>100</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>2.0</td><td>14.30</td><td>0.00</td><td>66.86</td><td>0</td></tr>
+</table></div>
+</div>
+
+<div id="tab-gatk_genomicsdb" class="tab-content">
+<div class="section-title">GATK (GenomicsDB) — Scalability Metrics</div>
+<div class="grid-3">
+<div class="card"><div id="chart_gatk_genomicsdb_wall_time_s" style="height:260px"></div></div>
+<div class="card"><div id="chart_gatk_genomicsdb_cpu_pct_avg" style="height:260px"></div></div>
+<div class="card"><div id="chart_gatk_genomicsdb_gpu_util_pct_avg" style="height:260px"></div></div>
+<div class="card"><div id="chart_gatk_genomicsdb_ram_used_gb_avg" style="height:260px"></div></div>
+<div class="card"><div id="chart_gatk_genomicsdb_gpu_mem_used_mb_max" style="height:260px"></div></div>
+<div class="card"><div id="chart_gatk_genomicsdb_disk_used_gb_max" style="height:260px"></div></div>
+</div>
+<div class="section-title">GATK (GenomicsDB) — Run Details</div>
+<div class="card" style="overflow-x:auto"><table>
+<tr><th>Size</th><th>Rep</th><th>Status</th><th>Wall Time (s)</th><th>CPU avg%</th><th>GPU util%</th><th>RAM avg GB</th><th>Variants</th></tr>
+</table></div>
+</div>
+
+<div id="tab-variants" class="tab-content">
+<p style="padding:24px;color:#888">No variant analysis data found. Run <code>scripts/03_analyze_variants.py</code> to generate.</p>
+</div>
+
+<div id="tab-extrap" class="tab-content">
+<div class="section-title">Extrapolação para Grandes Coortes</div>
+<div style="background:#e8f4fd;border-left:4px solid #2196F3;padding:14px 24px;margin:0 0 20px;border-radius:4px">
+<strong>⚠ Ressalvas sobre esta análise:</strong>
+<ul style="margin:8px 0 0 16px;line-height:1.7">
+<li>As projeções são baseadas em <strong>ajustes matemáticos</strong> (lei de potência e linear) sobre dados de 10–100 amostras. Comportamentos não-lineares podem surgir em escalas maiores.</li>
+<li>Em <strong>22.000 amostras</strong>, o pipeline envolve etapas adicionais (particionamento por cromossomo, paralelização distribuída) que não estão refletidas aqui.</li>
+<li>Consumo de <strong>RAM e disco</strong> podem ser limitantes antes mesmo do tempo.</li>
+<li>Resultados de R² próximos de 1 indicam boa aderência ao modelo — valores baixos sugerem comportamento não-monotônico e extrapolação menos confiável.</li>
+<li>Use estas projeções como <strong>estimativa de ordem de grandeza</strong>, não como previsão precisa.</li>
+</ul></div>
+<div class="card" style="margin-bottom:24px"><div class="section-title" style="font-size:1rem">Tempo de Execução (s)</div><div id="chart_extrap_0" style="height:360px"></div></div>
+<div class="card" style="margin-bottom:24px"><div class="section-title" style="font-size:1rem">Tempo de Execução (h)</div><div id="chart_extrap_1" style="height:360px"></div></div>
+<div class="card" style="margin-bottom:24px"><div class="section-title" style="font-size:1rem">RAM Pico (GB)</div><div id="chart_extrap_2" style="height:360px"></div></div>
+<div class="card" style="margin-bottom:24px"><div class="section-title" style="font-size:1rem">CPU Médio (%)</div><div id="chart_extrap_3" style="height:360px"></div></div>
+<div class="section-title">Projeção em 22.000 amostras (lei de potência)</div>
+<div class="card"><table>
+<tr><th>Software</th><th>Tempo (s)</th><th>Tempo (h)</th><th>RAM Pico (GB)</th><th>Modelo (expoente b)</th><th>R²</th></tr>
+<tr><td style="font-weight:600">GLnexus</td><td>81,904</td><td>22.8</td><td>1,820</td><td>0.871</td><td style="color:#2ca02c;font-weight:600">0.9748</td></tr>
+<tr><td style="font-weight:600">Parabricks</td><td>9</td><td>0.0</td><td>333</td><td>0.023</td><td style="color:#d62728;font-weight:600">0.0195</td></tr>
+<tr><td style="font-weight:600">GATK (CombineGVCFs)</td><td>—</td><td>—</td><td>—</td><td>linear</td><td style="color:#d62728;font-weight:600">—</td></tr>
+<tr><td style="font-weight:600">GATK (GenomicsDB)</td><td>—</td><td>—</td><td>—</td><td>linear</td><td style="color:#d62728;font-weight:600">—</td></tr>
+</table></div>
+<div style="background:#f8f9fa;border-radius:4px;padding:14px 24px;margin-top:16px;font-size:0.85rem;color:#555"><strong>Interpretação do expoente b (lei de potência y = a·x^b):</strong> b ≈ 1 → crescimento linear; b > 1 → super-linear (escala ruim); b &lt; 1 → sub-linear (boa escalabilidade). RAM com b &gt; 1 indica que o servidor pode ficar sem memória antes de completar 22k amostras com a abordagem atual.</div>
+</div>
+
+<div id="tab-raw" class="tab-content">
+<div class="section-title">Raw Benchmark Data</div>
+<div class="card" style="overflow-x:auto"><table>
+<tr><th>Software</th><th>Size</th><th>Rep</th><th>Status</th><th>Wall Time (s)</th><th>CPU avg%</th><th>CPU peak%</th><th>GPU util%</th><th>GPU peak%</th><th>GPU Mem MB</th><th>RAM avg GB</th><th>RAM peak GB</th><th>Disk peak GB</th><th>Variants</th><th>Valid</th></tr>
+<tr><td>GLnexus</td><td>10</td><td>1</td><td><span class="badge badge-success">success</span></td><td>104.00</td><td>18.67</td><td>49.10</td><td>0.00</td><td>0.00</td><td>55.00</td><td>76.54</td><td>82.36</td><td>1379.81</td><td>1734223</td><td>✓</td></tr>
+<tr><td>GLnexus</td><td>20</td><td>1</td><td><span class="badge badge-success">success</span></td><td>177.00</td><td>23.17</td><td>63.00</td><td>0.03</td><td>1.00</td><td>55.00</td><td>84.37</td><td>92.40</td><td>1381.14</td><td>3087313</td><td>✓</td></tr>
+<tr><td>GLnexus</td><td>30</td><td>1</td><td><span class="badge badge-success">success</span></td><td>248.00</td><td>26.95</td><td>70.80</td><td>0.00</td><td>0.00</td><td>55.00</td><td>93.47</td><td>106.93</td><td>1382.56</td><td>4057032</td><td>✓</td></tr>
+<tr><td>GLnexus</td><td>40</td><td>1</td><td><span class="badge badge-success">success</span></td><td>321.00</td><td>29.16</td><td>94.30</td><td>0.00</td><td>0.00</td><td>55.00</td><td>100.70</td><td>116.58</td><td>1383.97</td><td>5047488</td><td>✓</td></tr>
+<tr><td>GLnexus</td><td>50</td><td>1</td><td><span class="badge badge-success">success</span></td><td>395.00</td><td>31.61</td><td>99.10</td><td>0.00</td><td>0.00</td><td>55.00</td><td>108.19</td><td>127.55</td><td>1385.28</td><td>6048061</td><td>✓</td></tr>
+<tr><td>GLnexus</td><td>60</td><td>1</td><td><span class="badge badge-success">success</span></td><td>544.00</td><td>47.40</td><td>99.00</td><td>27.92</td><td>100.00</td><td>38659.00</td><td>141.98</td><td>215.06</td><td>1407.22</td><td>6890455</td><td>✓</td></tr>
+<tr><td>GLnexus</td><td>70</td><td>1</td><td><span class="badge badge-success">success</span></td><td>605.00</td><td>47.83</td><td>98.90</td><td>26.70</td><td>100.00</td><td>38659.00</td><td>148.13</td><td>209.74</td><td>1408.19</td><td>7461015</td><td>✓</td></tr>
+<tr><td>GLnexus</td><td>80</td><td>1</td><td><span class="badge badge-success">success</span></td><td>599.00</td><td>37.27</td><td>99.40</td><td>0.01</td><td>1.00</td><td>55.00</td><td>130.82</td><td>162.72</td><td>1389.58</td><td>8436228</td><td>✓</td></tr>
+<tr><td>GLnexus</td><td>90</td><td>1</td><td><span class="badge badge-success">success</span></td><td>653.00</td><td>39.28</td><td>99.70</td><td>0.00</td><td>0.00</td><td>55.00</td><td>137.67</td><td>174.34</td><td>1390.93</td><td>9197941</td><td>✓</td></tr>
+<tr><td>GLnexus</td><td>100</td><td>1</td><td><span class="badge badge-success">success</span></td><td>712.00</td><td>41.41</td><td>99.40</td><td>0.01</td><td>2.00</td><td>55.00</td><td>143.66</td><td>182.27</td><td>1392.25</td><td>10030297</td><td>✓</td></tr>
+<tr><td>Parabricks</td><td>10</td><td>1</td><td><span class="badge badge-success">success</span></td><td>8.00</td><td>33.65</td><td>67.30</td><td>0.00</td><td>0.00</td><td>55.00</td><td>113.28</td><td>114.40</td><td>1406.39</td><td>287497</td><td>✓</td></tr>
+<tr><td>Parabricks</td><td>20</td><td>1</td><td><span class="badge badge-success">success</span></td><td>8.00</td><td>82.85</td><td>100.00</td><td>0.00</td><td>0.00</td><td>55.00</td><td>116.22</td><td>117.38</td><td>1406.39</td><td>287497</td><td>✓</td></tr>
+<tr><td>Parabricks</td><td>30</td><td>1</td><td><span class="badge badge-success">success</span></td><td>6.00</td><td>41.10</td><td>67.90</td><td>0.00</td><td>0.00</td><td>55.00</td><td>119.29</td><td>120.55</td><td>1406.39</td><td>287312</td><td>✓</td></tr>
+<tr><td>Parabricks</td><td>40</td><td>1</td><td><span class="badge badge-success">success</span></td><td>7.00</td><td>33.00</td><td>66.00</td><td>0.00</td><td>0.00</td><td>55.00</td><td>122.14</td><td>123.22</td><td>1406.39</td><td>338388</td><td>✓</td></tr>
+<tr><td>Parabricks</td><td>50</td><td>1</td><td><span class="badge badge-success">success</span></td><td>8.00</td><td>87.00</td><td>100.00</td><td>0.00</td><td>0.00</td><td>55.00</td><td>125.44</td><td>126.71</td><td>1406.39</td><td>338388</td><td>✓</td></tr>
+<tr><td>Parabricks</td><td>60</td><td>1</td><td><span class="badge badge-success">success</span></td><td>9.00</td><td>37.50</td><td>75.00</td><td>0.00</td><td>0.00</td><td>55.00</td><td>129.03</td><td>130.34</td><td>1406.39</td><td>338388</td><td>✓</td></tr>
+<tr><td>Parabricks</td><td>70</td><td>1</td><td><span class="badge badge-success">success</span></td><td>7.00</td><td>37.30</td><td>60.30</td><td>0.00</td><td>0.00</td><td>55.00</td><td>132.51</td><td>133.57</td><td>1407.11</td><td>338388</td><td>✓</td></tr>
+<tr><td>Parabricks</td><td>80</td><td>1</td><td><span class="badge badge-success">success</span></td><td>8.00</td><td>39.10</td><td>78.20</td><td>0.00</td><td>0.00</td><td>59.00</td><td>143.49</td><td>151.24</td><td>1407.22</td><td>338388</td><td>✓</td></tr>
+<tr><td>Parabricks</td><td>90</td><td>1</td><td><span class="badge badge-success">success</span></td><td>8.00</td><td>54.40</td><td>83.80</td><td>0.00</td><td>0.00</td><td>59.00</td><td>176.77</td><td>184.21</td><td>1407.22</td><td>338388</td><td>✓</td></tr>
+<tr><td>Parabricks</td><td>100</td><td>1</td><td><span class="badge badge-success">success</span></td><td>8.00</td><td>93.50</td><td>100.00</td><td>0.00</td><td>0.00</td><td>59.00</td><td>140.11</td><td>141.54</td><td>1407.22</td><td>338388</td><td>✓</td></tr>
+<tr><td>GATK (CombineGVCFs)</td><td>10</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>3.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>55.00</td><td>66.73</td><td>66.73</td><td>1378.45</td><td>0</td><td>✗</td></tr>
+<tr><td>GATK (CombineGVCFs)</td><td>20</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.00</td><td>14.30</td><td>14.30</td><td>0.00</td><td>0.00</td><td>55.00</td><td>66.82</td><td>66.82</td><td>1378.45</td><td>0</td><td>✗</td></tr>
+<tr><td>GATK (CombineGVCFs)</td><td>30</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>55.00</td><td>66.86</td><td>66.86</td><td>1378.45</td><td>0</td><td>✗</td></tr>
+<tr><td>GATK (CombineGVCFs)</td><td>40</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.00</td><td>12.50</td><td>12.50</td><td>0.00</td><td>0.00</td><td>55.00</td><td>66.95</td><td>66.95</td><td>1378.45</td><td>0</td><td>✗</td></tr>
+<tr><td>GATK (CombineGVCFs)</td><td>50</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>2.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>55.00</td><td>66.87</td><td>66.87</td><td>1378.45</td><td>0</td><td>✗</td></tr>
+<tr><td>GATK (CombineGVCFs)</td><td>60</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>55.00</td><td>66.82</td><td>66.82</td><td>1378.45</td><td>0</td><td>✗</td></tr>
+<tr><td>GATK (CombineGVCFs)</td><td>70</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>55.00</td><td>66.82</td><td>66.82</td><td>1378.45</td><td>0</td><td>✗</td></tr>
+<tr><td>GATK (CombineGVCFs)</td><td>80</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.00</td><td>12.50</td><td>12.50</td><td>0.00</td><td>0.00</td><td>55.00</td><td>66.79</td><td>66.79</td><td>1378.45</td><td>0</td><td>✗</td></tr>
+<tr><td>GATK (CombineGVCFs)</td><td>90</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>1.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>55.00</td><td>66.80</td><td>66.80</td><td>1378.45</td><td>0</td><td>✗</td></tr>
+<tr><td>GATK (CombineGVCFs)</td><td>100</td><td>1</td><td><span class="badge badge-failed">failed</span></td><td>2.00</td><td>14.30</td><td>14.30</td><td>0.00</td><td>0.00</td><td>55.00</td><td>66.86</td><td>66.86</td><td>1378.45</td><td>0</td><td>✗</td></tr>
+</table></div>
+</div>
+
+<footer style="padding:16px 32px;text-align:center;color:#999;font-size:0.8rem;margin-top:32px">
+  GVCF Scalability Benchmark &mdash; 2026
+</footer>
+
+<script>
+
+function showTab(id, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    // Trigger resize so Plotly reflows
+    window.dispatchEvent(new Event('resize'));
+}
+
+
+// ── Chart initialisation ──────────────────────────────────────────────────────
+(function() {
+  // Overview tab
+  Plotly.newPlot('chart_cmp_0', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [104.0, 177.0, 248.0, 321.0, 395.0, 544.0, 605.0, 599.0, 653.0, 712.0], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [8.0, 8.0, 6.0, 7.0, 8.0, 9.0, 7.0, 8.0, 8.0, 8.0], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "Wall Time (s)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "Wall Time (s)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_cmp_1', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [18.671, 23.169, 26.955, 29.164, 31.606, 47.403, 47.833, 37.274, 39.284, 41.409], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [33.65, 82.85, 41.1, 33.0, 87.0, 37.5, 37.3, 39.1, 54.4, 93.5], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "CPU avg (%)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "CPU avg (%)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_cmp_2', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [49.1, 63.0, 70.8, 94.3, 99.1, 99.0, 98.9, 99.4, 99.7, 99.4], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [67.3, 100.0, 67.9, 66.0, 100.0, 75.0, 60.3, 78.2, 83.8, 100.0], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "CPU peak (%)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "CPU peak (%)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_cmp_3', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [76.541, 84.369, 93.467, 100.699, 108.187, 141.98, 148.13, 130.823, 137.666, 143.656], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [113.275, 116.22, 119.287, 122.135, 125.442, 129.028, 132.514, 143.493, 176.774, 140.11], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "RAM avg (GB)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "RAM avg (GB)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_cmp_4', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [82.363, 92.4, 106.931, 116.578, 127.548, 215.059, 209.741, 162.715, 174.336, 182.27], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [114.399, 117.376, 120.545, 123.221, 126.711, 130.344, 133.572, 151.242, 184.207, 141.541], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "RAM peak (GB)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "RAM peak (GB)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_cmp_5', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [1379.81, 1381.145, 1382.56, 1383.967, 1385.279, 1407.222, 1408.192, 1389.582, 1390.935, 1392.253], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [1406.39, 1406.39, 1406.39, 1406.39, 1406.39, 1406.39, 1407.109, 1407.222, 1407.222, 1407.222], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "Disk peak (GB)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "Disk peak (GB)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_cmp_6', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [0.0, 0.029, 0.0, 0.0, 0.0, 27.916, 26.697, 0.008, 0.0, 0.014], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "GPU util avg (%)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "GPU util avg (%)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_cmp_7', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [0.0, 1.0, 0.0, 0.0, 0.0, 100.0, 100.0, 1.0, 0.0, 2.0], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "GPU util peak (%)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "GPU util peak (%)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_cmp_8', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [55.0, 55.0, 55.0, 55.0, 55.0, 38659.0, 38659.0, 55.0, 55.0, 55.0], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [55.0, 55.0, 55.0, 55.0, 55.0, 55.0, 55.0, 59.0, 59.0, 59.0], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "GPU Mem peak (MB)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "GPU Mem peak (MB)", "font": {"size": 14}}}, {responsive: true});
+  // Per-software tabs
+  Plotly.newPlot('chart_glnexus_wall_time_s', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [104.0, 177.0, 248.0, 321.0, 395.0, 544.0, 605.0, 599.0, 653.0, 712.0], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [120.527, 190.588, 260.648, 330.709, 400.77, 470.83, 540.891, 610.952, 681.012, 751.073], "name": "Linear fit", "mode": "lines", "line": {"dash": "dash", "color": "#aaa", "width": 1}, "showlegend": false, "hoverinfo": "skip"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "Wall Time (s)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "Wall Time (s) (R\u00b2=0.970)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_glnexus_cpu_pct_avg', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [18.671, 23.169, 26.955, 29.164, 31.606, 47.403, 47.833, 37.274, 39.284, 41.409], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [22.254, 24.926, 27.597, 30.269, 32.941, 35.613, 38.284, 40.956, 43.628, 46.3], "name": "Linear fit", "mode": "lines", "line": {"dash": "dash", "color": "#aaa", "width": 1}, "showlegend": false, "hoverinfo": "skip"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "CPU avg (%)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "CPU avg (%) (R\u00b2=0.658)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_glnexus_gpu_util_pct_avg', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [0.0, 0.029, 0.0, 0.0, 0.0, 27.916, 26.697, 0.008, 0.0, 0.014], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [2.522, 3.176, 3.83, 4.485, 5.139, 5.794, 6.448, 7.102, 7.757, 8.411], "name": "Linear fit", "mode": "lines", "line": {"dash": "dash", "color": "#aaa", "width": 1}, "showlegend": false, "hoverinfo": "skip"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "GPU util avg (%)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "GPU util avg (%) (R\u00b2=0.030)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_glnexus_ram_used_gb_avg', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [76.541, 84.369, 93.467, 100.699, 108.187, 141.98, 148.13, 130.823, 137.666, 143.656], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [80.007, 88.128, 96.249, 104.37, 112.491, 120.612, 128.733, 136.855, 144.976, 153.097], "name": "Linear fit", "mode": "lines", "line": {"dash": "dash", "color": "#aaa", "width": 1}, "showlegend": false, "hoverinfo": "skip"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "RAM avg (GB)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "RAM avg (GB) (R\u00b2=0.835)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_glnexus_gpu_mem_used_mb_max', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [55.0, 55.0, 55.0, 55.0, 55.0, 38659.0, 38659.0, 55.0, 55.0, 55.0], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [3564.455, 4500.309, 5436.164, 6372.018, 7307.873, 8243.727, 9179.582, 10115.436, 11051.291, 11987.145], "name": "Linear fit", "mode": "lines", "line": {"dash": "dash", "color": "#aaa", "width": 1}, "showlegend": false, "hoverinfo": "skip"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "GPU Mem peak (MB)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "GPU Mem peak (MB) (R\u00b2=0.030)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_glnexus_disk_used_gb_max', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [1379.81, 1381.145, 1382.56, 1383.967, 1385.279, 1407.222, 1408.192, 1389.582, 1390.935, 1392.253], "name": "GLnexus", "mode": "lines+markers", "line": {"color": "#1f77b4", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [1381.633, 1383.514, 1385.394, 1387.274, 1389.154, 1391.035, 1392.915, 1394.795, 1396.675, 1398.556], "name": "Linear fit", "mode": "lines", "line": {"dash": "dash", "color": "#aaa", "width": 1}, "showlegend": false, "hoverinfo": "skip"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "Disk peak (GB)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "Disk peak (GB) (R\u00b2=0.314)", "font": {"size": 14}}}, {responsive: true});
+  Plotly.newPlot('chart_parabricks_wall_time_s', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [8.0, 8.0, 6.0, 7.0, 8.0, 9.0, 7.0, 8.0, 8.0, 8.0], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [7.4, 7.467, 7.533, 7.6, 7.667, 7.733, 7.8, 7.867, 7.933, 8.0], "name": "Linear fit", "mode": "lines", "line": {"dash": "dash", "color": "#aaa", "width": 1}, "showlegend": false, "hoverinfo": "skip"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "Wall Time (s)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "Wall Time (s) (R\u00b2=0.060)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_parabricks_cpu_pct_avg', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [33.65, 82.85, 41.1, 33.0, 87.0, 37.5, 37.3, 39.1, 54.4, 93.5], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [45.952, 47.727, 49.502, 51.277, 53.052, 54.828, 56.603, 58.378, 60.153, 61.928], "name": "Linear fit", "mode": "lines", "line": {"dash": "dash", "color": "#aaa", "width": 1}, "showlegend": false, "hoverinfo": "skip"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "CPU avg (%)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "CPU avg (%) (R\u00b2=0.049)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_parabricks_gpu_util_pct_avg', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "name": "Linear fit", "mode": "lines", "line": {"dash": "dash", "color": "#aaa", "width": 1}, "showlegend": false, "hoverinfo": "skip"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "GPU util avg (%)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "GPU util avg (%) (R\u00b2=1.000)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_parabricks_ram_used_gb_avg', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [113.275, 116.22, 119.287, 122.135, 125.442, 129.028, 132.514, 143.493, 176.774, 140.11], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [109.433, 114.41, 119.386, 124.363, 129.339, 134.316, 139.293, 144.269, 149.246, 154.223], "name": "Linear fit", "mode": "lines", "line": {"dash": "dash", "color": "#aaa", "width": 1}, "showlegend": false, "hoverinfo": "skip"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "RAM avg (GB)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "RAM avg (GB) (R\u00b2=0.656)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_parabricks_gpu_mem_used_mb_max', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [55.0, 55.0, 55.0, 55.0, 55.0, 55.0, 55.0, 59.0, 59.0, 59.0], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [53.909, 54.418, 54.927, 55.436, 55.945, 56.455, 56.964, 57.473, 57.982, 58.491], "name": "Linear fit", "mode": "lines", "line": {"dash": "dash", "color": "#aaa", "width": 1}, "showlegend": false, "hoverinfo": "skip"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "GPU Mem peak (MB)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "GPU Mem peak (MB) (R\u00b2=0.636)", "font": {"size": 14}}}, {responsive: true});
+Plotly.newPlot('chart_parabricks_disk_used_gb_max', [{"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [1406.39, 1406.39, 1406.39, 1406.39, 1406.39, 1406.39, 1407.109, 1407.222, 1407.222, 1407.222], "name": "Parabricks", "mode": "lines+markers", "line": {"color": "#ff7f0e", "width": 2}, "marker": {"size": 6, "opacity": 1.0}, "opacity": 1.0, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f}<extra></extra>"}, {"x": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100], "y": [1406.176, 1406.295, 1406.414, 1406.533, 1406.652, 1406.771, 1406.89, 1407.009, 1407.128, 1407.247], "name": "Linear fit", "mode": "lines", "line": {"dash": "dash", "color": "#aaa", "width": 1}, "showlegend": false, "hoverinfo": "skip"}], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Dataset size (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"gridcolor": "#eee", "title": "Disk peak (GB)"}, "legend": {"orientation": "h", "y": -0.2}, "hovermode": "x unified", "title": {"text": "Disk peak (GB) (R\u00b2=0.748)", "font": {"size": 14}}}, {responsive: true});
+  document.getElementById('chart_gatk_wall_time_s').innerHTML='<p style="padding:20px;color:#888">No data</p>';
+document.getElementById('chart_gatk_cpu_pct_avg').innerHTML='<p style="padding:20px;color:#888">No data</p>';
+document.getElementById('chart_gatk_gpu_util_pct_avg').innerHTML='<p style="padding:20px;color:#888">No data</p>';
+document.getElementById('chart_gatk_ram_used_gb_avg').innerHTML='<p style="padding:20px;color:#888">No data</p>';
+document.getElementById('chart_gatk_gpu_mem_used_mb_max').innerHTML='<p style="padding:20px;color:#888">No data</p>';
+document.getElementById('chart_gatk_disk_used_gb_max').innerHTML='<p style="padding:20px;color:#888">No data</p>';
+  document.getElementById('chart_gatk_genomicsdb_wall_time_s').innerHTML='<p style="padding:20px;color:#888">No data</p>';
+document.getElementById('chart_gatk_genomicsdb_cpu_pct_avg').innerHTML='<p style="padding:20px;color:#888">No data</p>';
+document.getElementById('chart_gatk_genomicsdb_gpu_util_pct_avg').innerHTML='<p style="padding:20px;color:#888">No data</p>';
+document.getElementById('chart_gatk_genomicsdb_ram_used_gb_avg').innerHTML='<p style="padding:20px;color:#888">No data</p>';
+document.getElementById('chart_gatk_genomicsdb_gpu_mem_used_mb_max').innerHTML='<p style="padding:20px;color:#888">No data</p>';
+document.getElementById('chart_gatk_genomicsdb_disk_used_gb_max').innerHTML='<p style="padding:20px;color:#888">No data</p>';
+  // Variant analysis tab
+  
+  // Extrapolation tab
+  Plotly.newPlot('chart_extrap_0', [{"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0], "y": [104.0, 177.0, 248.0, 321.0, 395.0, 544.0, 605.0, 599.0, 653.0, 712.0], "name": "GLnexus (observado)", "mode": "markers", "marker": {"size": 9, "color": "#1f77b4", "symbol": "circle"}, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f} s (N=%{x})<extra>observado</extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [100.2049, 183.3122, 260.9926, 335.3463, 407.3202, 477.4529, 546.0904, 613.4735, 679.7786, 745.1406, 3028.9018, 5540.9908, 12312.1001, 22523.4223, 41203.7386, 81904.2335], "name": "GLnexus (lei pot\u00eancia, R\u00b2=0.975)", "mode": "lines", "line": {"color": "#1f77b4", "dash": "solid", "width": 2}, "opacity": 0.85, "showlegend": true, "hovertemplate": "GLnexus pot\u00eancia: %{y:.2f} s @ N=%{x} (y=13.5\u00b7x^0.871)<extra></extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [120.5273, 190.5879, 260.6485, 330.7091, 400.7697, 470.8303, 540.8909, 610.9515, 681.0121, 751.0727, 3553.497, 7056.5273, 17565.6182, 35080.7697, 70111.0727, 154183.8], "name": "GLnexus (linear, R\u00b2=0.970)", "mode": "lines", "line": {"color": "#1f77b4", "dash": "dot", "width": 1}, "opacity": 0.5, "showlegend": true, "hovertemplate": "GLnexus linear: %{y:.2f} s @ N=%{x}<extra></extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0], "y": [8.0, 8.0, 6.0, 7.0, 8.0, 9.0, 7.0, 8.0, 8.0, 8.0], "name": "Parabricks (observado)", "mode": "markers", "marker": {"size": 9, "color": "#ff7f0e", "symbol": "circle"}, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f} s (N=%{x})<extra>observado</extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [7.3992, 7.5169, 7.5865, 7.6364, 7.6752, 7.7071, 7.7342, 7.7578, 7.7786, 7.7972, 8.0881, 8.2167, 8.3898, 8.5232, 8.6586, 8.8154], "name": "Parabricks (lei pot\u00eancia, R\u00b2=0.019)", "mode": "lines", "line": {"color": "#ff7f0e", "dash": "solid", "width": 2}, "opacity": 0.85, "showlegend": true, "hovertemplate": "Parabricks pot\u00eancia: %{y:.2f} s @ N=%{x} (y=7.02\u00b7x^0.023)<extra></extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [7.4, 7.4667, 7.5333, 7.6, 7.6667, 7.7333, 7.8, 7.8667, 7.9333, 8.0, 10.6667, 14.0, 24.0, 40.6667, 74.0, 154.0], "name": "Parabricks (linear, R\u00b2=0.060)", "mode": "lines", "line": {"color": "#ff7f0e", "dash": "dot", "width": 1}, "opacity": 0.5, "showlegend": true, "hovertemplate": "Parabricks linear: %{y:.2f} s @ N=%{x}<extra></extra>"}], {"margin": {"l": 70, "r": 220, "t": 50, "b": 70}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "N\u00famero de amostras (GVCFs)", "type": "log", "gridcolor": "#eee", "tickvals": [10, 25, 50, 75, 100, 500, 1000, 2500, 5000, 10000, 22000], "ticktext": ["10", "25", "50", "75", "100", "500", "1k", "2.5k", "5k", "10k", "22k"]}, "yaxis": {"title": "Tempo de Execu\u00e7\u00e3o (s)", "gridcolor": "#eee"}, "legend": {"orientation": "v", "x": 1.01, "y": 1, "font": {"size": 10}}, "hovermode": "x unified", "title": {"text": "Tempo de Execu\u00e7\u00e3o (s) \u2014 Observado + Projetado", "font": {"size": 14}}, "shapes": [{"type": "line", "x0": 22000, "x1": 22000, "y0": 0, "y1": 1, "yref": "paper", "line": {"color": "#d62728", "dash": "dash", "width": 2}}], "annotations": [{"x": 4.342422680822207, "y": 0.97, "xref": "x", "yref": "paper", "text": "22k amostras", "showarrow": false, "font": {"color": "#d62728", "size": 11}}]}, {responsive: true});
+Plotly.newPlot('chart_extrap_1', [{"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0], "y": [0.0289, 0.0492, 0.0689, 0.0892, 0.1097, 0.1511, 0.1681, 0.1664, 0.1814, 0.1978], "name": "GLnexus (observado)", "mode": "markers", "marker": {"size": 9, "color": "#1f77b4", "symbol": "circle"}, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f} h (N=%{x})<extra>observado</extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [0.0278, 0.0509, 0.0725, 0.0932, 0.1131, 0.1326, 0.1517, 0.1704, 0.1888, 0.207, 0.8414, 1.5392, 3.42, 6.2565, 11.4455, 22.7512], "name": "GLnexus (lei pot\u00eancia, R\u00b2=0.975)", "mode": "lines", "line": {"color": "#1f77b4", "dash": "solid", "width": 2}, "opacity": 0.85, "showlegend": true, "hovertemplate": "GLnexus pot\u00eancia: %{y:.2f} h @ N=%{x} (y=0.00374\u00b7x^0.871)<extra></extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [0.0335, 0.0529, 0.0724, 0.0919, 0.1113, 0.1308, 0.1502, 0.1697, 0.1892, 0.2086, 0.9871, 1.9601, 4.8793, 9.7447, 19.4753, 42.8288], "name": "GLnexus (linear, R\u00b2=0.970)", "mode": "lines", "line": {"color": "#1f77b4", "dash": "dot", "width": 1}, "opacity": 0.5, "showlegend": true, "hovertemplate": "GLnexus linear: %{y:.2f} h @ N=%{x}<extra></extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0], "y": [0.0022, 0.0022, 0.0017, 0.0019, 0.0022, 0.0025, 0.0019, 0.0022, 0.0022, 0.0022], "name": "Parabricks (observado)", "mode": "markers", "marker": {"size": 9, "color": "#ff7f0e", "symbol": "circle"}, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f} h (N=%{x})<extra>observado</extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [0.0021, 0.0021, 0.0021, 0.0021, 0.0021, 0.0021, 0.0021, 0.0022, 0.0022, 0.0022, 0.0022, 0.0023, 0.0023, 0.0024, 0.0024, 0.0024], "name": "Parabricks (lei pot\u00eancia, R\u00b2=0.019)", "mode": "lines", "line": {"color": "#ff7f0e", "dash": "solid", "width": 2}, "opacity": 0.85, "showlegend": true, "hovertemplate": "Parabricks pot\u00eancia: %{y:.2f} h @ N=%{x} (y=0.00195\u00b7x^0.023)<extra></extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [0.0021, 0.0021, 0.0021, 0.0021, 0.0021, 0.0021, 0.0022, 0.0022, 0.0022, 0.0022, 0.003, 0.0039, 0.0067, 0.0113, 0.0206, 0.0428], "name": "Parabricks (linear, R\u00b2=0.060)", "mode": "lines", "line": {"color": "#ff7f0e", "dash": "dot", "width": 1}, "opacity": 0.5, "showlegend": true, "hovertemplate": "Parabricks linear: %{y:.2f} h @ N=%{x}<extra></extra>"}], {"margin": {"l": 70, "r": 220, "t": 50, "b": 70}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "N\u00famero de amostras (GVCFs)", "type": "log", "gridcolor": "#eee", "tickvals": [10, 25, 50, 75, 100, 500, 1000, 2500, 5000, 10000, 22000], "ticktext": ["10", "25", "50", "75", "100", "500", "1k", "2.5k", "5k", "10k", "22k"]}, "yaxis": {"title": "Tempo de Execu\u00e7\u00e3o (h)", "gridcolor": "#eee"}, "legend": {"orientation": "v", "x": 1.01, "y": 1, "font": {"size": 10}}, "hovermode": "x unified", "title": {"text": "Tempo de Execu\u00e7\u00e3o (h) \u2014 Observado + Projetado", "font": {"size": 14}}, "shapes": [{"type": "line", "x0": 22000, "x1": 22000, "y0": 0, "y1": 1, "yref": "paper", "line": {"color": "#d62728", "dash": "dash", "width": 2}}], "annotations": [{"x": 4.342422680822207, "y": 0.97, "xref": "x", "yref": "paper", "text": "22k amostras", "showarrow": false, "font": {"color": "#d62728", "size": 11}}]}, {responsive: true});
+Plotly.newPlot('chart_extrap_2', [{"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0], "y": [82.363, 92.4, 106.931, 116.578, 127.548, 215.059, 209.741, 162.715, 174.336, 182.27], "name": "GLnexus (observado)", "mode": "markers", "marker": {"size": 9, "color": "#1f77b4", "symbol": "circle"}, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f} GB (N=%{x})<extra>observado</extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [74.6044, 99.4765, 117.7105, 132.6406, 145.5135, 156.9535, 167.3248, 176.8612, 185.723, 194.0258, 378.4413, 504.6085, 738.138, 984.2233, 1312.3501, 1820.4875], "name": "GLnexus (lei pot\u00eancia, R\u00b2=0.691)", "mode": "lines", "line": {"color": "#1f77b4", "dash": "solid", "width": 2}, "opacity": 0.85, "showlegend": true, "hovertemplate": "GLnexus pot\u00eancia: %{y:.2f} GB @ N=%{x} (y=28.7\u00b7x^0.415)<extra></extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [89.2131, 102.0534, 114.8936, 127.7338, 140.574, 153.4142, 166.2544, 179.0946, 191.9348, 204.7751, 718.3835, 1360.3941, 3286.426, 6496.479, 12916.5851, 28324.8396], "name": "GLnexus (linear, R\u00b2=0.652)", "mode": "lines", "line": {"color": "#1f77b4", "dash": "dot", "width": 1}, "opacity": 0.5, "showlegend": true, "hovertemplate": "GLnexus linear: %{y:.2f} GB @ N=%{x}<extra></extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0], "y": [114.399, 117.376, 120.545, 123.221, 126.711, 130.344, 133.572, 151.242, 184.207, 141.541], "name": "Parabricks (observado)", "mode": "markers", "marker": {"size": 9, "color": "#ff7f0e", "symbol": "circle"}, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f} GB (N=%{x})<extra>observado</extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [106.3277, 117.8395, 125.1429, 130.5977, 134.992, 138.6919, 141.8991, 144.7372, 147.2877, 149.6072, 189.9391, 210.5033, 241.1437, 267.2518, 296.1865, 332.9267], "name": "Parabricks (lei pot\u00eancia, R\u00b2=0.533)", "mode": "lines", "line": {"color": "#ff7f0e", "dash": "solid", "width": 2}, "opacity": 0.85, "showlegend": true, "hovertemplate": "Parabricks pot\u00eancia: %{y:.2f} GB @ N=%{x} (y=75.6\u00b7x^0.148)<extra></extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [109.7631, 115.2192, 120.6754, 126.1316, 131.5877, 137.0439, 142.5, 147.9562, 153.4124, 158.8685, 377.1148, 649.9227, 1468.3463, 2832.3857, 5560.4645, 12107.8536], "name": "Parabricks (linear, R\u00b2=0.630)", "mode": "lines", "line": {"color": "#ff7f0e", "dash": "dot", "width": 1}, "opacity": 0.5, "showlegend": true, "hovertemplate": "Parabricks linear: %{y:.2f} GB @ N=%{x}<extra></extra>"}], {"margin": {"l": 70, "r": 220, "t": 50, "b": 70}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "N\u00famero de amostras (GVCFs)", "type": "log", "gridcolor": "#eee", "tickvals": [10, 25, 50, 75, 100, 500, 1000, 2500, 5000, 10000, 22000], "ticktext": ["10", "25", "50", "75", "100", "500", "1k", "2.5k", "5k", "10k", "22k"]}, "yaxis": {"title": "RAM Pico (GB)", "gridcolor": "#eee"}, "legend": {"orientation": "v", "x": 1.01, "y": 1, "font": {"size": 10}}, "hovermode": "x unified", "title": {"text": "RAM Pico (GB) \u2014 Observado + Projetado", "font": {"size": 14}}, "shapes": [{"type": "line", "x0": 22000, "x1": 22000, "y0": 0, "y1": 1, "yref": "paper", "line": {"color": "#d62728", "dash": "dash", "width": 2}}], "annotations": [{"x": 4.342422680822207, "y": 0.97, "xref": "x", "yref": "paper", "text": "22k amostras", "showarrow": false, "font": {"color": "#d62728", "size": 11}}]}, {responsive: true});
+Plotly.newPlot('chart_extrap_3', [{"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0], "y": [18.671, 23.169, 26.955, 29.164, 31.606, 47.403, 47.833, 37.274, 39.284, 41.409], "name": "GLnexus (observado)", "mode": "markers", "marker": {"size": 9, "color": "#1f77b4", "symbol": "circle"}, "showlegend": true, "hovertemplate": "GLnexus: %{y:.2f} % (N=%{x})<extra>observado</extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [18.301, 23.9474, 28.0267, 31.3358, 34.1694, 36.6738, 38.9338, 41.0039, 42.921, 44.7117, 83.4802, 109.2363, 155.8642, 203.9529, 266.8784, 362.3723], "name": "GLnexus (lei pot\u00eancia, R\u00b2=0.726)", "mode": "lines", "line": {"color": "#1f77b4", "dash": "solid", "width": 2}, "opacity": 0.85, "showlegend": true, "hovertemplate": "GLnexus pot\u00eancia: %{y:.2f} % @ N=%{x} (y=7.49\u00b7x^0.388)<extra></extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [22.2537, 24.9255, 27.5973, 30.2691, 32.9409, 35.6127, 38.2845, 40.9563, 43.6281, 46.2999, 153.1716, 286.7613, 687.5304, 1355.4789, 2691.3759, 5897.5286], "name": "GLnexus (linear, R\u00b2=0.658)", "mode": "lines", "line": {"color": "#1f77b4", "dash": "dot", "width": 1}, "opacity": 0.5, "showlegend": true, "hovertemplate": "GLnexus linear: %{y:.2f} % @ N=%{x}<extra></extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0], "y": [33.65, 82.85, 41.1, 33.0, 87.0, 37.5, 37.3, 39.1, 54.4, 93.5], "name": "Parabricks (observado)", "mode": "markers", "marker": {"size": 9, "color": "#ff7f0e", "symbol": "circle"}, "showlegend": true, "hovertemplate": "Parabricks: %{y:.2f} % (N=%{x})<extra>observado</extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [41.4728, 45.0541, 47.2907, 48.9447, 50.2673, 51.3744, 52.3295, 53.1712, 53.9248, 54.608, 66.1878, 71.9033, 80.2231, 87.1506, 94.6763, 104.0299], "name": "Parabricks (lei pot\u00eancia, R\u00b2=0.003)", "mode": "lines", "line": {"color": "#ff7f0e", "dash": "solid", "width": 2}, "opacity": 0.85, "showlegend": true, "hovertemplate": "Parabricks pot\u00eancia: %{y:.2f} % @ N=%{x} (y=31.5\u00b7x^0.119)<extra></extra>"}, {"x": [10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 500.0, 1000.0, 2500.0, 5000.0, 10000.0, 22000.0], "y": [45.9518, 47.727, 49.5021, 51.2773, 53.0524, 54.8276, 56.6027, 58.3779, 60.153, 61.9282, 132.9342, 221.6918, 487.9645, 931.7524, 1819.3282, 3949.51], "name": "Parabricks (linear, R\u00b2=0.049)", "mode": "lines", "line": {"color": "#ff7f0e", "dash": "dot", "width": 1}, "opacity": 0.5, "showlegend": true, "hovertemplate": "Parabricks linear: %{y:.2f} % @ N=%{x}<extra></extra>"}], {"margin": {"l": 70, "r": 220, "t": 50, "b": 70}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "N\u00famero de amostras (GVCFs)", "type": "log", "gridcolor": "#eee", "tickvals": [10, 25, 50, 75, 100, 500, 1000, 2500, 5000, 10000, 22000], "ticktext": ["10", "25", "50", "75", "100", "500", "1k", "2.5k", "5k", "10k", "22k"]}, "yaxis": {"title": "CPU M\u00e9dio (%)", "gridcolor": "#eee"}, "legend": {"orientation": "v", "x": 1.01, "y": 1, "font": {"size": 10}}, "hovermode": "x unified", "title": {"text": "CPU M\u00e9dio (%) \u2014 Observado + Projetado", "font": {"size": 14}}, "shapes": [{"type": "line", "x0": 22000, "x1": 22000, "y0": 0, "y1": 1, "yref": "paper", "line": {"color": "#d62728", "dash": "dash", "width": 2}}], "annotations": [{"x": 4.342422680822207, "y": 0.97, "xref": "x", "yref": "paper", "text": "22k amostras", "showarrow": false, "font": {"color": "#d62728", "size": 11}}]}, {responsive: true});
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GVCF Benchmark — Relatório de Concordância</title>
+  <script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+  <style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f6fa; color: #333; }
+header { background: linear-gradient(135deg,#1A1A2E,#16213E); color: #fff;
+         padding: 24px 32px; }
+header h1 { font-size: 1.6rem; margin-bottom: 6px; }
+header p  { opacity: .7; font-size: .9rem; }
+.tabs { display: flex; gap: 4px; padding: 12px 32px 0;
+        background: #fff; border-bottom: 2px solid #e0e0e0; flex-wrap: wrap; }
+.tab-btn { padding: 8px 18px; border: none; border-radius: 6px 6px 0 0;
+           cursor: pointer; background: #f0f0f0; font-size: .9rem; }
+.tab-btn.active { background: #1A1A2E; color: #fff; }
+.tab-content { display: none; padding: 24px 32px; }
+.tab-content.active { display: block; }
+.card { background: #fff; border-radius: 8px; padding: 20px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 16px; }
+.section-title { font-size: 1.1rem; font-weight: 600; color: #1A1A2E;
+                 margin: 24px 0 12px; border-left: 4px solid #4a90e2;
+                 padding-left: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: .875rem; }
+th, td { padding: 8px 12px; border: 1px solid #e0e0e0; text-align: center; }
+th { background: #1A1A2E; color: #fff; font-weight: 600; }
+tr:nth-child(even) { background: #f9f9f9; }
+.alert-box { border-radius: 6px; padding: 12px 18px; margin-bottom: 8px;
+             border-left: 5px solid; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Relatório de Concordância Inter-Ferramenta</h1>
+  <p>Gerado: 2026-03-04 13:42:19 &nbsp;|&nbsp;
+     Ferramentas: GLnexus, Parabricks, GATK CombineGVCFs, GATK GenomicsDB &nbsp;|&nbsp;
+     Métrica: Jaccard similarity por réplica × tamanho</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('tab-overview',this)">Visão Geral</button>
+  <button class="tab-btn" onclick="showTab('tab-alerts',this)">Alertas</button>
+  <button class="tab-btn" onclick="showTab('tab-heatmap',this)">Heatmap</button>
+  <button class="tab-btn" onclick="showTab('tab-composition',this)">Composição</button>
+  <button class="tab-btn" onclick="showTab('tab-stability',this)">Estabilidade</button>
+  <button class="tab-btn" onclick="showTab('tab-rawdata',this)">Dados Brutos</button>
+</div>
+
+<div id="tab-overview" class="tab-content active">
+<div class="section-title">Concordância inter-ferramenta — Visão Geral</div>
+<p style="margin-bottom:16px;color:#555;font-size:.9rem">Jaccard = |A∩B|/|A∪B|. Valor 1.0 = concordância perfeita; valores abaixo de 0.8 são marcados como Aviso e abaixo de 0.7 como Crítico.</p>
+<div class="card"><table>
+<tr><th>Par de Ferramentas</th><th>Média</th><th>DP</th></tr>
+<tr><td style="text-align:left;font-weight:600">GLnexus vs Parabricks</td><td>—</td><td>—</td></tr>
+<tr><td style="text-align:left;font-weight:600">GLnexus vs GATK (CombineGVCFs)</td><td>—</td><td>—</td></tr>
+<tr><td style="text-align:left;font-weight:600">GLnexus vs GATK (GenomicsDB)</td><td>—</td><td>—</td></tr>
+<tr><td style="text-align:left;font-weight:600">Parabricks vs GATK (CombineGVCFs)</td><td>—</td><td>—</td></tr>
+<tr><td style="text-align:left;font-weight:600">Parabricks vs GATK (GenomicsDB)</td><td>—</td><td>—</td></tr>
+<tr><td style="text-align:left;font-weight:600">GATK (CombineGVCFs) vs GATK (GenomicsDB)</td><td>—</td><td>—</td></tr>
+</table></div>
+<div class="card"><div class="section-title" style="font-size:1rem">Jaccard médio por tamanho de dataset</div><div id="chart_jaccard_overview" style="height:350px"></div></div>
+</div>
+
+<div id="tab-alerts" class="tab-content">
+<div class="section-title">Alertas de Concordância</div>
+<div style="background:#d4edda;border-left:4px solid #28a745;padding:14px 20px;border-radius:4px"><strong>✓ Todas as concordâncias estão acima do limiar de aviso (0.8).</strong></div>
+</div>
+
+<div id="tab-heatmap" class="tab-content">
+<div class="section-title">Heatmap de Concordância por Tamanho</div>
+<p style="color:#555;margin-bottom:16px;font-size:.9rem">Média do Jaccard sobre todas as réplicas disponíveis. Diagonal = 1.0 (ferramenta comparada com si mesma).</p>
+</div>
+
+<div id="tab-composition" class="tab-content">
+<div class="section-title">Composição das Variantes por Ferramenta</div>
+<p style="color:#555;margin-bottom:16px;font-size:.9rem">Percentual de variantes exclusivas (apenas nessa ferramenta), compartilhadas com pelo menos uma outra ferramenta, e presentes em todas as ferramentas. Médias sobre todas as réplicas.</p>
+<div class="card"><div id="chart_composition" style="height:420px"></div></div>
+<div class="card"><div class="section-title" style="font-size:1rem">Variantes presentes em TODAS as ferramentas</div><div id="chart_all_common" style="height:300px"></div></div>
+</div>
+
+<div id="tab-stability" class="tab-content">
+<div class="section-title">Estabilidade da Concordância entre Réplicas</div>
+<p style="color:#555;margin-bottom:16px;font-size:.9rem">Cada ponto mostra o Jaccard médio ± desvio padrão calculado sobre as 3 réplicas. Barras de erro largas indicam comportamento inconsistente entre execuções com diferentes conjuntos de amostras.</p>
+<div class="card"><div id="chart_stability" style="height:400px"></div></div>
+<div class="section-title">Tabela de Estabilidade</div>
+<div class="card"><table>
+<tr><th>Par</th></tr>
+<tr><td style="text-align:left;font-weight:600">GLnexus vs Parabricks</td></tr>
+<tr><td style="text-align:left;font-weight:600">GLnexus vs GATK (CombineGVCFs)</td></tr>
+<tr><td style="text-align:left;font-weight:600">GLnexus vs GATK (GenomicsDB)</td></tr>
+<tr><td style="text-align:left;font-weight:600">Parabricks vs GATK (CombineGVCFs)</td></tr>
+<tr><td style="text-align:left;font-weight:600">Parabricks vs GATK (GenomicsDB)</td></tr>
+<tr><td style="text-align:left;font-weight:600">GATK (CombineGVCFs) vs GATK (GenomicsDB)</td></tr>
+</table></div>
+</div>
+
+<div id="tab-rawdata" class="tab-content">
+<div class="section-title">Dados Brutos de Concordância</div>
+<div class="card"><table>
+<tr><th>Tamanho</th><th>Réplica</th><th>Ferramentas presentes</th><th>Total únicas</th><th>Jaccard: GLnexus vs Parabricks</th><th>Jaccard: GLnexus vs GATK (CombineGVCFs)</th><th>Jaccard: GLnexus vs GATK (GenomicsDB)</th><th>Jaccard: Parabricks vs GATK (CombineGVCFs)</th><th>Jaccard: Parabricks vs GATK (GenomicsDB)</th><th>Jaccard: GATK (CombineGVCFs) vs GATK (GenomicsDB)</th><th>Exclusivas: GLnexus</th><th>Exclusivas: Parabricks</th><th>Exclusivas: GATK (CombineGVCFs)</th><th>Exclusivas: GATK (GenomicsDB)</th><th>Em comum (todas)</th></tr>
+</table></div>
+</div>
+
+<footer style="padding:16px 32px;text-align:center;color:#999;font-size:0.8rem;margin-top:32px">
+  GVCF Scalability Benchmark — Concordância Inter-Ferramenta &mdash; 2026
+</footer>
+
+<script>
+
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+
+(function() {
+  Plotly.newPlot('chart_jaccard_overview', [], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Tamanho do dataset (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"title": "Jaccard similarity", "range": [0, 1.05], "gridcolor": "#eee"}, "legend": {"orientation": "h", "y": -0.25}, "hovermode": "x unified", "title": {"text": "Jaccard m\u00e9dio por tamanho de dataset", "font": {"size": 14}}, "shapes": [{"type": "line", "x0": 0, "x1": 100, "y0": 0.8, "y1": 0.8, "line": {"color": "#ff7f0e", "dash": "dash", "width": 1.5}}, {"type": "line", "x0": 0, "x1": 100, "y0": 0.7, "y1": 0.7, "line": {"color": "#d62728", "dash": "dot", "width": 1.5}}], "annotations": [{"x": 100, "y": 0.8200000000000001, "xanchor": "right", "text": "Aviso (0.8)", "showarrow": false, "font": {"color": "#ff7f0e", "size": 10}}, {"x": 100, "y": 0.6699999999999999, "xanchor": "right", "text": "Cr\u00edtico (0.7)", "showarrow": false, "font": {"color": "#d62728", "size": 10}}]}, {responsive: true});
+  
+  Plotly.newPlot('chart_composition', [], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Tamanho do dataset (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"title": "% de variantes exclusivas", "gridcolor": "#eee"}, "legend": {"orientation": "h", "y": -0.3}, "hovermode": "x unified", "title": {"text": "% Variantes Exclusivas por Ferramenta", "font": {"size": 14}}, "barmode": "group"}, {responsive: true});
+Plotly.newPlot('chart_all_common', [], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Tamanho do dataset (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"title": "% do total da ferramenta", "gridcolor": "#eee"}, "legend": {"orientation": "h", "y": -0.25}, "hovermode": "x unified", "title": {"text": "% Variantes Presentes em Todas as Ferramentas", "font": {"size": 14}}}, {responsive: true});
+  Plotly.newPlot('chart_stability', [], {"margin": {"l": 60, "r": 20, "t": 40, "b": 60}, "paper_bgcolor": "rgba(0,0,0,0)", "plot_bgcolor": "#fafafa", "font": {"family": "Segoe UI, Arial", "size": 12}, "xaxis": {"title": "Tamanho do dataset (# GVCFs)", "gridcolor": "#eee"}, "yaxis": {"title": "Jaccard similarity", "range": [0, 1.05], "gridcolor": "#eee"}, "legend": {"orientation": "h", "y": -0.25}, "hovermode": "x unified", "title": {"text": "Estabilidade do Jaccard por tamanho (m\u00e9dia \u00b1 DP das r\u00e9plicas)", "font": {"size": 14}}}, {responsive: true});
+})();
+</script>
+
+</body>
+</html>
