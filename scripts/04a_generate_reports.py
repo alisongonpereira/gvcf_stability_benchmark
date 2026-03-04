@@ -1392,13 +1392,13 @@ def generate_excel(data: dict, output_path: Path):
     for sw in SOFTWARES:
         size_dict = data.get(sw, {})
         for size in sorted(size_dict):
-            rec = size_dict[size]
-            for col_idx, (_, key) in enumerate(columns, start=1):
-                val = rec.get(key, "")
-                if isinstance(val, bool):
-                    val = "Yes" if val else "No"
-                ws1.cell(row=row_num, column=col_idx, value=val)
-            row_num += 1
+            for rec in size_dict[size]:   # iterate over replicates
+                for col_idx, (_, key) in enumerate(columns, start=1):
+                    val = rec.get(key, "")
+                    if isinstance(val, bool):
+                        val = "Yes" if val else "No"
+                    ws1.cell(row=row_num, column=col_idx, value=val)
+                row_num += 1
 
     for col in ws1.columns:
         width = max(len(str(cell.value or "")) for cell in col) + 4
@@ -1414,7 +1414,7 @@ def generate_excel(data: dict, output_path: Path):
     ws2["A4"] = "R² (linear fit) per metric"
     _apply(ws2["A4"], font=Font(bold=True))
 
-    r2_headers = ["Metric", "GLnexus", "Parabricks", "GATK"]
+    r2_headers = ["Metric"] + [SOFT_LABEL.get(s, s) for s in SOFTWARES]
     for ci, h in enumerate(r2_headers, start=1):
         cell = ws2.cell(row=5, column=ci, value=h)
         _apply(cell, font=hs["font"], fill=hs["fill"], alignment=hs["alignment"])
@@ -1424,10 +1424,15 @@ def generate_excel(data: dict, output_path: Path):
         ws2.cell(row=row_num, column=1, value=label)
         for ci, sw in enumerate(SOFTWARES, start=2):
             size_dict = data.get(sw, {})
-            xs = sorted(k for k in size_dict if size_dict[k].get("status") == "success")
-            ys_raw = [size_dict[s].get(metric) for s in xs]
-            xs_f = [x for x, y in zip(xs, ys_raw) if isinstance(y, (int, float))]
-            ys_f = [y for y in ys_raw if isinstance(y, (int, float))]
+            xs_f, ys_f = [], []
+            for size in sorted(size_dict):
+                reps = size_dict[size]
+                vals = [r.get(metric) for r in reps
+                        if r.get("status") == "success"
+                        and isinstance(r.get(metric), (int, float))]
+                if vals:
+                    xs_f.append(size)
+                    ys_f.append(_mean(vals))
             r2 = compute_r2(xs_f, ys_f)
             cell = ws2.cell(row=row_num, column=ci,
                             value=round(r2, 4) if r2 is not None else "N/A")
@@ -1440,9 +1445,9 @@ def generate_excel(data: dict, output_path: Path):
                     cell.fill = PatternFill("solid", fgColor="F8D7DA")
         row_num += 1
 
-    # Wall-time summary table
+    # Wall-time summary table (mean across replicates)
     row_num += 2
-    ws2.cell(row=row_num, column=1, value="Wall Time by Software and Size (seconds)")
+    ws2.cell(row=row_num, column=1, value="Wall Time by Software and Size — mean (seconds)")
     _apply(ws2.cell(row=row_num, column=1), font=Font(bold=True))
     row_num += 1
 
@@ -1456,9 +1461,10 @@ def generate_excel(data: dict, output_path: Path):
     for size in size_set:
         ws2.cell(row=row_num, column=1, value=size)
         for ci, sw in enumerate(SOFTWARES, start=2):
-            rec = data.get(sw, {}).get(size)
-            if rec and rec.get("status") == "success":
-                ws2.cell(row=row_num, column=ci, value=round(rec.get("wall_time_s", 0), 1))
+            reps = data.get(sw, {}).get(size, [])
+            wts = [r.get("wall_time_s", 0) for r in reps if r.get("status") == "success"]
+            if wts:
+                ws2.cell(row=row_num, column=ci, value=round(_mean(wts), 1))
             else:
                 ws2.cell(row=row_num, column=ci, value="N/A")
         row_num += 1
@@ -1485,12 +1491,13 @@ def _collect_caveats(data: dict) -> list[str]:
 
     for sw, size_dict in data.items():
         coarse_sizes = []
-        for size, rec in size_dict.items():
-            if rec.get("status") != "success":
-                continue
-            wt = rec.get("wall_time_s", 0)
-            if wt < MONITOR_INTERVAL_S * COARSE_THRESHOLD:
-                coarse_sizes.append((size, wt))
+        for size, reps in size_dict.items():
+            for rec in reps:
+                if rec.get("status") != "success":
+                    continue
+                wt = rec.get("wall_time_s", 0)
+                if wt < MONITOR_INTERVAL_S * COARSE_THRESHOLD:
+                    coarse_sizes.append((size, wt))
         if coarse_sizes:
             sizes_str = ", ".join(
                 f"N={s} ({wt:.0f}s)" for s, wt in sorted(coarse_sizes)
