@@ -102,6 +102,11 @@ run_size() {
 
     local exit_code=0
 
+    start_monitor "${monitor_json}"
+
+    local start_epoch; start_epoch=$(date +%s)
+    local start_iso;   start_iso=$(date -u +%Y-%m-%dT%H:%M:%S)
+
     # ── Step A: CombineGVCFs ─────────────────────────────────────────────────
     # NOTE: LD_PRELOAD (libjemalloc) must be unset before invoking the JVM —
     # libjemalloc + JVM = SIGSEGV (exit 245).
@@ -115,17 +120,18 @@ run_size() {
         >> "${stderr_log}" 2>&1 \
     || exit_code=$?
 
+    local combine_end_epoch; combine_end_epoch=$(date +%s)
+    local wall_time_combine=$(( combine_end_epoch - start_epoch ))
+
     if [[ "${exit_code}" -ne 0 ]]; then
         warn "PARABRICKS" "[dataset_${size}_rep${rep}] CombineGVCFs failed (exit_code=${exit_code}) — see ${stderr_log}"
+    else
+        log "PARABRICKS" "[dataset_${size}_rep${rep}] Step A done — combine_time=${wall_time_combine}s"
     fi
 
-    # Start resource monitor (covers only the GPU genotyping step)
-    start_monitor "${monitor_json}"
-
-    local start_epoch; start_epoch=$(date +%s)
-    local start_iso;   start_iso=$(date -u +%Y-%m-%dT%H:%M:%S)
-
     # ── Step B: pbrun genotypegvcf ────────────────────────────────────────────
+    local genotype_start_epoch; genotype_start_epoch=$(date +%s)
+
     if [[ "${exit_code}" -eq 0 ]]; then
         log "PARABRICKS" "[dataset_${size}_rep${rep}] Step B: pbrun genotypegvcf..."
         docker run --rm \
@@ -145,6 +151,7 @@ run_size() {
     local end_epoch; end_epoch=$(date +%s)
     local end_iso;   end_iso=$(date -u +%Y-%m-%dT%H:%M:%S)
     local wall_time=$(( end_epoch - start_epoch ))
+    local wall_time_genotype=$(( end_epoch - genotype_start_epoch ))
 
     stop_monitor
 
@@ -176,7 +183,19 @@ run_size() {
         "${output_vcf}"   "${output_valid}" "${variant_count}" \
         "${monitor_json}"
 
-    log "PARABRICKS" "[dataset_${size}_rep${rep}] Done — status=${status} wall_time=${wall_time}s variants=${variant_count}"
+    # Inject per-step breakdown into the metrics JSON
+    python3 - "${metrics_json}" "${wall_time_combine}" "${wall_time_genotype}" <<'PYEOF'
+import json, sys
+path, combine, genotype = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
+with open(path) as f:
+    d = json.load(f)
+d["wall_time_combine_s"]  = combine
+d["wall_time_genotype_s"] = genotype
+with open(path, "w") as f:
+    json.dump(d, f, indent=2)
+PYEOF
+
+    log "PARABRICKS" "[dataset_${size}_rep${rep}] Done — status=${status} wall_time=${wall_time}s (combine=${wall_time_combine}s + genotype=${wall_time_genotype}s) variants=${variant_count}"
 
     if [[ "${status}" == "success" ]]; then
         mark_done "${output_dir}"
