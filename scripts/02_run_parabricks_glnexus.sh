@@ -99,7 +99,7 @@ run_size() {
     # ── Step A: pbrun glnexus (GPU) ──────────────────────────────────────────
     log "PB_GLNEXUS" "[dataset_${size}_rep${rep}] Step A: pbrun glnexus..."
     docker run --rm \
-        --gpus "\"device=${PARABRICKS_GPU_DEVICES}\"" \
+        --gpus "device=${PARABRICKS_GPU_DEVICES}" \
         -v /nfs:/nfs -v /home:/home \
         -v /home/alisongonpereira/raid:/home/alisongonpereira/raid \
         -w "${PWD}" \
