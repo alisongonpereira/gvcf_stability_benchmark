@@ -171,9 +171,11 @@ def load_all_metrics(metrics_dir: Path) -> dict:
             "exit_code":     rec.get("exit_code", -1),
             "output_valid":  rec.get("output_valid", False),
             "variant_count": rec.get("variant_count", 0),
-            "wall_time_s":   rec.get("wall_time_s", 0),
-            "start_time":    rec.get("start_time", ""),
-            "end_time":      rec.get("end_time", ""),
+            "wall_time_s":          rec.get("wall_time_s", 0),
+            "wall_time_combine_s":  rec.get("wall_time_combine_s"),
+            "wall_time_genotype_s": rec.get("wall_time_genotype_s"),
+            "start_time":           rec.get("start_time", ""),
+            "end_time":             rec.get("end_time", ""),
         }
         for k, v in rec.get("resources", {}).items():
             flat[k] = v
@@ -841,14 +843,79 @@ def build_software_tab(sw: str, data: dict) -> tuple[str, str]:
             )
         html_parts.append("</table></div>")
 
+    # ── Parabricks-only: CombineGVCFs vs genotypegvcf breakdown ────────────────
+    if sw == "parabricks":
+        has_breakdown = any(
+            r.get("wall_time_combine_s") is not None
+            for reps in size_dict.values() for r in reps
+        )
+        if has_breakdown:
+            html_parts.append(
+                '<div class="section-title">Parabricks — Breakdown por Etapa</div>'
+            )
+            html_parts.append(
+                '<p style="margin:0 0 8px;color:#555;font-size:0.85rem">'
+                'CombineGVCFs (CPU, GATK) + pbrun genotypegvcf (GPU). '
+                'O wall time total inclui ambas as etapas.</p>'
+            )
+            div_id_bd = "chart_parabricks_breakdown"
+            html_parts.append(
+                f'<div class="card"><div id="{div_id_bd}" style="height:300px"></div></div>'
+            )
+
+            mean_combine, mean_genotype, bd_sizes = [], [], []
+            for s in sizes:
+                c_vals = [r["wall_time_combine_s"]  for r in size_dict[s]
+                          if r.get("status") == "success" and r.get("wall_time_combine_s") is not None]
+                g_vals = [r["wall_time_genotype_s"] for r in size_dict[s]
+                          if r.get("status") == "success" and r.get("wall_time_genotype_s") is not None]
+                if c_vals and g_vals:
+                    bd_sizes.append(s)
+                    mean_combine.append(round(_mean(c_vals), 1))
+                    mean_genotype.append(round(_mean(g_vals), 1))
+
+            trace_combine  = json.dumps({
+                "x": bd_sizes, "y": mean_combine,
+                "name": "CombineGVCFs (CPU)", "type": "bar",
+                "marker": {"color": "#aec7e8"},
+            })
+            trace_genotype = json.dumps({
+                "x": bd_sizes, "y": mean_genotype,
+                "name": "pbrun genotypegvcf (GPU)", "type": "bar",
+                "marker": {"color": "#ff7f0e"},
+            })
+            layout_bd = json.dumps({
+                "barmode": "stack",
+                "xaxis": {"title": "Dataset Size"},
+                "yaxis": {"title": "Tempo (s)"},
+                "legend": {"orientation": "h", "y": -0.2},
+                "margin": {"t": 30, "b": 60},
+                "plot_bgcolor": "#fff",
+                "paper_bgcolor": "#fff",
+            })
+            js_parts.append(
+                f"Plotly.newPlot('{div_id_bd}',"
+                f"[{trace_combine},{trace_genotype}],{layout_bd},"
+                f"{{responsive:true}});"
+            )
+
     # Detailed results table — one row per (size, replicate)
     html_parts.append(f'<div class="section-title">{label} — Run Details</div>')
     html_parts.append('<div class="card" style="overflow-x:auto"><table>')
-    html_parts.append(
-        "<tr><th>Size</th><th>Rep</th><th>Status</th><th>Wall Time (s)</th>"
-        "<th>CPU avg%</th><th>GPU util%</th><th>RAM avg GB</th>"
-        "<th>Variants</th></tr>"
-    )
+
+    if sw == "parabricks":
+        html_parts.append(
+            "<tr><th>Size</th><th>Rep</th><th>Status</th><th>Wall Time (s)</th>"
+            "<th>↳ CombineGVCFs (s)</th><th>↳ genotypegvcf (s)</th>"
+            "<th>CPU avg%</th><th>GPU util%</th><th>RAM avg GB</th>"
+            "<th>Variants</th></tr>"
+        )
+    else:
+        html_parts.append(
+            "<tr><th>Size</th><th>Rep</th><th>Status</th><th>Wall Time (s)</th>"
+            "<th>CPU avg%</th><th>GPU util%</th><th>RAM avg GB</th>"
+            "<th>Variants</th></tr>"
+        )
 
     def _fmt(v):
         return f"{v:.2f}" if isinstance(v, float) else str(v)
@@ -863,12 +930,27 @@ def build_software_tab(sw: str, data: dict) -> tuple[str, str]:
             gpu      = rep_data.get("gpu_util_pct_avg", "—")
             ram      = rep_data.get("ram_used_gb_avg", "—")
             variants = rep_data.get("variant_count", "—")
-            html_parts.append(
-                f"<tr><td>{s}</td><td>{rep_n}</td>"
-                f'<td><span class="badge badge-{cls}">{status}</span></td>'
-                f"<td>{wt:.1f}</td><td>{_fmt(cpu)}</td><td>{_fmt(gpu)}</td>"
-                f"<td>{_fmt(ram)}</td><td>{variants}</td></tr>"
-            )
+            if sw == "parabricks":
+                wt_c = rep_data.get("wall_time_combine_s")
+                wt_g = rep_data.get("wall_time_genotype_s")
+                wt_c_str = f"{wt_c:.0f}" if isinstance(wt_c, (int, float)) else "—"
+                wt_g_str = f"{wt_g:.0f}" if isinstance(wt_g, (int, float)) else "—"
+                html_parts.append(
+                    f"<tr><td>{s}</td><td>{rep_n}</td>"
+                    f'<td><span class="badge badge-{cls}">{status}</span></td>'
+                    f"<td>{wt:.1f}</td>"
+                    f"<td style='color:#666'>{wt_c_str}</td>"
+                    f"<td style='color:#666'>{wt_g_str}</td>"
+                    f"<td>{_fmt(cpu)}</td><td>{_fmt(gpu)}</td>"
+                    f"<td>{_fmt(ram)}</td><td>{variants}</td></tr>"
+                )
+            else:
+                html_parts.append(
+                    f"<tr><td>{s}</td><td>{rep_n}</td>"
+                    f'<td><span class="badge badge-{cls}">{status}</span></td>'
+                    f"<td>{wt:.1f}</td><td>{_fmt(cpu)}</td><td>{_fmt(gpu)}</td>"
+                    f"<td>{_fmt(ram)}</td><td>{variants}</td></tr>"
+                )
     html_parts.append("</table></div>")
 
     return "\n".join(html_parts), "\n".join(js_parts)
