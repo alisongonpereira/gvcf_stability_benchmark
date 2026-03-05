@@ -31,14 +31,16 @@ from pathlib import Path
 
 # ─── Configuration ────────────────────────────────────────────────────────────
 
-SOFTWARES = ["glnexus", "parabricks", "gatk", "gatk_genomicsdb"]
+SOFTWARES = ["parabricks_glnexus", "glnexus", "parabricks", "gatk", "gatk_genomicsdb"]
 SOFT_LABEL = {
+    "parabricks_glnexus": "Parabricks GLnexus (GPU)",
     "glnexus":         "GLnexus",
-    "parabricks":      "Parabricks",
+    "parabricks":      "Parabricks (genotypegvcf)",
     "gatk":            "GATK (CombineGVCFs)",
     "gatk_genomicsdb": "GATK (GenomicsDB)",
 }
 SOFT_COLOR = {
+    "parabricks_glnexus": "#d62728",
     "glnexus":         "#1f77b4",
     "parabricks":      "#ff7f0e",
     "gatk":            "#2ca02c",

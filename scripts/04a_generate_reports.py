@@ -105,14 +105,16 @@ def find_inflections(x_vals, y_vals, rel_threshold=0.5):
 # ─── Data loading ─────────────────────────────────────────────────────────────
 
 
-SOFTWARES  = ["glnexus", "parabricks", "gatk", "gatk_genomicsdb"]
+SOFTWARES  = ["parabricks_glnexus", "glnexus", "parabricks", "gatk", "gatk_genomicsdb"]
 SOFT_LABEL = {
+    "parabricks_glnexus": "Parabricks GLnexus (GPU)",
     "glnexus":        "GLnexus",
-    "parabricks":     "Parabricks",
+    "parabricks":     "Parabricks (genotypegvcf)",
     "gatk":           "GATK (CombineGVCFs)",
     "gatk_genomicsdb": "GATK (GenomicsDB)",
 }
 SOFT_COLOR = {
+    "parabricks_glnexus": "#d62728",
     "glnexus":        "#1f77b4",
     "parabricks":     "#ff7f0e",
     "gatk":           "#2ca02c",
@@ -1349,8 +1351,9 @@ def generate_html(
 {_render_caveats(caveats)}
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('tab-cmp',this)">Overview</button>
+  <button class="tab-btn" onclick="showTab('tab-parabricks_glnexus',this)">Parabricks GLnexus</button>
   <button class="tab-btn" onclick="showTab('tab-glnexus',this)">GLnexus</button>
-  <button class="tab-btn" onclick="showTab('tab-parabricks',this)">Parabricks</button>
+  <button class="tab-btn" onclick="showTab('tab-parabricks',this)">Parabricks (genotypegvcf)</button>
   <button class="tab-btn" onclick="showTab('tab-gatk',this)">GATK CombineGVCFs</button>
   <button class="tab-btn" onclick="showTab('tab-gatk_genomicsdb',this)">GATK GenomicsDB</button>
   <button class="tab-btn" onclick="showTab('tab-variants',this)">Variant Analysis</button>
@@ -1360,6 +1363,10 @@ def generate_html(
 
 <div id="tab-cmp" class="tab-content active">
 {cmp_html}
+</div>
+
+<div id="tab-parabricks_glnexus" class="tab-content">
+{sw_tabs.get('parabricks_glnexus','')}
 </div>
 
 <div id="tab-glnexus" class="tab-content">
@@ -1402,6 +1409,7 @@ def generate_html(
   // Overview tab
   {cmp_js}
   // Per-software tabs
+  {sw_js.get('parabricks_glnexus','')}
   {sw_js.get('glnexus','')}
   {sw_js.get('parabricks','')}
   {sw_js.get('gatk','')}

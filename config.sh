@@ -37,10 +37,16 @@ BCFTOOLS_THREADS="${BCFTOOLS_THREADS:-${BENCHMARK_THREADS}}"
 # GPU device(s) to use, e.g. "0" for the first A100
 PARABRICKS_GPU="${PARABRICKS_GPU:-0}"
 
-# Parabricks via Docker (pbrun inside container)
+# Parabricks 4.5 via Docker — CombineGVCFs (CPU) + pbrun genotypegvcf (GPU)
 # Note: mount /nfs/theseus and $HOME so container sees your data + reference.
 PARABRICKS_DOCKER_IMAGE="${PARABRICKS_DOCKER_IMAGE:-nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1}"
 PARABRICKS_BIN="${PARABRICKS_BIN:-docker run --rm --gpus \"device=${PARABRICKS_GPU}\" -v /nfs/theseus:/nfs/theseus -v ${HOME}:${HOME} -w ${PWD} ${PARABRICKS_DOCKER_IMAGE} pbrun}"
+
+# Parabricks 3.6 via Docker — pbrun glnexus (GPU, no pre-combining needed)
+# GLnexus GPU: takes individual GVCFs directly, outputs BCF (converted to VCF via bcftools)
+PARABRICKS_GLNEXUS_DOCKER_IMAGE="${PARABRICKS_GLNEXUS_DOCKER_IMAGE:-nvcr.io/nvidia/clara/clara-parabricks:3.6.1-1}"
+# GLnexus config preset: same options as glnexus_cli (DeepVariantWGS, DeepVariantWES, gatk, etc.)
+PARABRICKS_GLNEXUS_CONFIG="${PARABRICKS_GLNEXUS_CONFIG:-${GLNEXUS_CONFIG}}"
 
 # ─── GATK ─────────────────────────────────────────────────────────────────────
 # Java heap = 80% of RAM; ParallelGC uses 80% of CPU cores for GC.
@@ -67,8 +73,8 @@ BENCHMARK_REPLICATES="${BENCHMARK_REPLICATES:-3}"
 RANDOM_SEED="${RANDOM_SEED:-42}"
 # Resource-monitor sampling interval (seconds)
 MONITOR_INTERVAL="${MONITOR_INTERVAL:-5}"
-# Run order: Parabricks (GPU, fastest) → GLnexus → GATK GenomicsDB → GATK CombineGVCFs (slowest)
-BENCHMARK_SOFTWARES=("parabricks" "glnexus" "gatk_genomicsdb" "gatk")
+# Run order: GPU tools first (fastest) → CPU tools (slowest)
+BENCHMARK_SOFTWARES=("parabricks_glnexus" "parabricks" "glnexus" "gatk_genomicsdb" "gatk")
 
 # ─── Paths (derived; normally no need to change) ──────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
