@@ -96,15 +96,17 @@ run_size() {
     local start_epoch; start_epoch=$(date +%s)
     local start_iso;   start_iso=$(date -u +%Y-%m-%dT%H:%M:%S)
 
-    # ── Step A: pbrun glnexus (GPU) ──────────────────────────────────────────
-    log "PB_GLNEXUS" "[dataset_${size}_rep${rep}] Step A: pbrun glnexus..."
+    # ── Step A: glnexus (GPU) via Parabricks 3.x entrypoint ─────────────────
+    # Parabricks 3.x uses /parabricks/run_pipeline.py as entrypoint.
+    # The tool name is passed as the first argument (no "pbrun" prefix).
+    log "PB_GLNEXUS" "[dataset_${size}_rep${rep}] Step A: glnexus (GPU)..."
     docker run --rm \
         --gpus "device=${PARABRICKS_GPU_DEVICES}" \
         -v /nfs:/nfs -v /home:/home \
         -v /home/alisongonpereira/raid:/home/alisongonpereira/raid \
         -w "${PWD}" \
         "${PARABRICKS_GLNEXUS_DOCKER_IMAGE}" \
-        pbrun glnexus \
+        glnexus \
             "${in_gvcf_args[@]}" \
             --out-bcf "${output_bcf}" \
             --config  "${PARABRICKS_GLNEXUS_CONFIG}" \
