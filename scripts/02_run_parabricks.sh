@@ -62,11 +62,13 @@ run_size() {
     local manifest="${dataset_dir}/manifest.txt"
     local output_dir="${BENCHMARK_DIR}/02_execution/${SOFTWARE}/dataset_${size}_rep${rep}"
     local output_vcf="${output_dir}/output.vcf"
+    local combined_gvcf="${output_dir}/combined.g.vcf.gz"
     local stderr_log="${output_dir}/stderr.log"
     local monitor_json="${output_dir}/monitor.json"
     local metrics_json="${BENCHMARK_DIR}/03_metrics/metrics_${SOFTWARE}_${size}_rep${rep}.json"
+    local tmp_dir="${output_dir}/tmp"
 
-    mkdir -p "${output_dir}"
+    mkdir -p "${output_dir}" "${tmp_dir}"
 
     if is_done "${output_dir}"; then
         log "PARABRICKS" "[dataset_${size}_rep${rep}] Already completed — skipping"
@@ -82,52 +84,73 @@ run_size() {
     gvcf_count=$(wc -l < "${manifest}")
     log "PARABRICKS" "[dataset_${size}_rep${rep}] Starting — ${gvcf_count} GVCFs"
 
-    # Build --in-gvcf arguments
-    local ingvcf_args=()
+    # Build -V arguments for CombineGVCFs (Parabricks genotypegvcf requires a
+    # pre-combined gVCF — passing individual per-sample GVCFs produces a 1-sample output)
+    local v_args=()
     while IFS= read -r gvcf; do
         [[ -z "${gvcf}" ]] && continue
-        # Parabricks works with bgzipped GVCFs
         if command -v bgzip &>/dev/null && command -v tabix &>/dev/null; then
             ready_gvcf=$(ensure_bgzipped "${gvcf}")
         else
             ready_gvcf="${gvcf}"
         fi
-        ingvcf_args+=(--in-gvcf "${ready_gvcf}")
+        v_args+=(-V "${ready_gvcf}")
     done < "${manifest}"
 
-    # Start resource monitor
+    # Clean up any leftover intermediate files from a previous failed run
+    rm -f "${combined_gvcf}" "${combined_gvcf}.tbi"
+
+    local exit_code=0
+
+    # ── Step A: CombineGVCFs ─────────────────────────────────────────────────
+    # NOTE: LD_PRELOAD (libjemalloc) must be unset before invoking the JVM —
+    # libjemalloc + JVM = SIGSEGV (exit 245).
+    log "PARABRICKS" "[dataset_${size}_rep${rep}] Step A: CombineGVCFs..."
+    env -u LD_PRELOAD "${GATK_BIN}" --java-options "${GATK_JAVA_OPTS}" \
+        CombineGVCFs \
+        -R "${REF_GENOME}" \
+        "${v_args[@]}" \
+        -O "${combined_gvcf}" \
+        --tmp-dir "${tmp_dir}" \
+        >> "${stderr_log}" 2>&1 \
+    || exit_code=$?
+
+    if [[ "${exit_code}" -ne 0 ]]; then
+        warn "PARABRICKS" "[dataset_${size}_rep${rep}] CombineGVCFs failed (exit_code=${exit_code}) — see ${stderr_log}"
+    fi
+
+    # Start resource monitor (covers only the GPU genotyping step)
     start_monitor "${monitor_json}"
 
     local start_epoch; start_epoch=$(date +%s)
     local start_iso;   start_iso=$(date -u +%Y-%m-%dT%H:%M:%S)
-    local exit_code=0
 
-    log "PARABRICKS" "[dataset_${size}_rep${rep}] Executing pbrun genotypegvcf..."
-    # "${PARABRICKS_BIN}" joint_genotyping \
-    #     --ref     "${REF_GENOME}" \
-    #     "${ingvcf_args[@]}" \
-    #     --out-vcf "${output_vcf}" \
-    #     --gpus '"device=0,1,2,4"' \
-    #     2>"${stderr_log}" \
-    # || exit_code=$?
-    docker run --rm \
-    --gpus "\"device=${PARABRICKS_GPU_DEVICES}\"" \
-    -v /nfs:/nfs -v /home:/home \
-    -v /home/alisongonpereira/raid:/home/alisongonpereira/raid \
-    -w "${PWD}" \
-    "${PARABRICKS_DOCKER_IMAGE}" \
-    pbrun genotypegvcf \
-        --ref "${REF_GENOME}" \
-        "${ingvcf_args[@]}" \
-        --out-vcf "${output_vcf}" \
-        2>"${stderr_log}" \
-    || exit_code=$?
+    # ── Step B: pbrun genotypegvcf ────────────────────────────────────────────
+    if [[ "${exit_code}" -eq 0 ]]; then
+        log "PARABRICKS" "[dataset_${size}_rep${rep}] Step B: pbrun genotypegvcf..."
+        docker run --rm \
+            --gpus "\"device=${PARABRICKS_GPU_DEVICES}\"" \
+            -v /nfs:/nfs -v /home:/home \
+            -v /home/alisongonpereira/raid:/home/alisongonpereira/raid \
+            -w "${PWD}" \
+            "${PARABRICKS_DOCKER_IMAGE}" \
+            pbrun genotypegvcf \
+                --ref "${REF_GENOME}" \
+                --in-gvcf "${combined_gvcf}" \
+                --out-vcf "${output_vcf}" \
+                2>>"${stderr_log}" \
+        || exit_code=$?
+    fi
 
     local end_epoch; end_epoch=$(date +%s)
     local end_iso;   end_iso=$(date -u +%Y-%m-%dT%H:%M:%S)
     local wall_time=$(( end_epoch - start_epoch ))
 
     stop_monitor
+
+    # Clean up intermediate combined GVCF and tmp (keep final VCF)
+    rm -f "${combined_gvcf}" "${combined_gvcf}.tbi"
+    rm -rf "${tmp_dir}"
 
     local status="success"
     local output_valid="false"
