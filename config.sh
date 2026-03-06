@@ -51,6 +51,9 @@ PARABRICKS_GLNEXUS_CONFIG="${PARABRICKS_GLNEXUS_CONFIG:-${GLNEXUS_CONFIG}}"
 # ─── GATK ─────────────────────────────────────────────────────────────────────
 # Java heap = 80% of RAM; ParallelGC uses 80% of CPU cores for GC.
 GATK_JAVA_OPTS="${GATK_JAVA_OPTS:--Xmx${BENCHMARK_MEM_GB}g -XX:+UseParallelGC -XX:ParallelGCThreads=${BENCHMARK_THREADS}}"
+# Per-chromosome Java opts (used when CombineGVCFs / GenotypeGVCFs run in parallel per chr).
+# ~25 main chromosomes on hg38: 400G / 25 ≈ 16G RAM; 102 cores / 25 ≈ 4 GC threads each.
+GATK_CHR_JAVA_OPTS="${GATK_CHR_JAVA_OPTS:--Xmx16g -XX:+UseParallelGC -XX:ParallelGCThreads=4}"
 # gatk wrapper path
 GATK_BIN="${GATK_BIN:-gatk}"
 
@@ -74,7 +77,7 @@ RANDOM_SEED="${RANDOM_SEED:-42}"
 # Resource-monitor sampling interval (seconds)
 MONITOR_INTERVAL="${MONITOR_INTERVAL:-5}"
 # Run order: GPU tools first (fastest) → CPU tools (slowest)
-BENCHMARK_SOFTWARES=("parabricks_glnexus" "parabricks" "glnexus" "gatk_genomicsdb" "gatk")
+BENCHMARK_SOFTWARES=("parabricks" "glnexus" "gatk_genomicsdb" "gatk")
 
 # ─── Paths (derived; normally no need to change) ──────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

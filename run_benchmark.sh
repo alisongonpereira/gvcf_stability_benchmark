@@ -55,9 +55,9 @@ setup_directories() {
     log "SETUP" "Creating benchmark directory structure..."
     mkdir -p \
         "${BENCHMARK_DIR}/01_prep" \
+        "${BENCHMARK_DIR}/02_execution/preprocessing" \
         "${BENCHMARK_DIR}/02_execution/glnexus" \
         "${BENCHMARK_DIR}/02_execution/parabricks" \
-        "${BENCHMARK_DIR}/02_execution/parabricks_glnexus" \
         "${BENCHMARK_DIR}/02_execution/gatk" \
         "${BENCHMARK_DIR}/02_execution/gatk_genomicsdb" \
         "${BENCHMARK_DIR}/03_metrics" \
@@ -101,14 +101,6 @@ validate_environment() {
                     log "VALIDATE" "Parabricks: found (docker image ${PARABRICKS_DOCKER_IMAGE})"
                 else
                     warn "VALIDATE" "Parabricks: NOT FOUND — docker/pbrun unavailable (will skip)"
-                fi
-                ;;
-            parabricks_glnexus)
-                if command -v docker >/dev/null 2>&1 && \
-                    docker image inspect "${PARABRICKS_GLNEXUS_DOCKER_IMAGE:-nvcr.io/nvidia/clara/clara-parabricks:3.6.1-1}" >/dev/null 2>&1; then
-                    log "VALIDATE" "Parabricks GLnexus: found (docker image ${PARABRICKS_GLNEXUS_DOCKER_IMAGE})"
-                else
-                    warn "VALIDATE" "Parabricks GLnexus: NOT FOUND — docker image ${PARABRICKS_GLNEXUS_DOCKER_IMAGE} not available (will skip)"
                 fi
                 ;;
             gatk)
