@@ -20,7 +20,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/../config.sh"
 source "${SCRIPT_DIR}/common.sh"
-source "${SCRIPT_DIR}/02_preprocess_by_chr.sh"
+source "${SCRIPTS_DIR}/02_preprocess_by_chr.sh"
 
 : "${PARABRICKS_GPU_DEVICES:=${PARABRICKS_GPU:-0}}"
 SOFTWARE="parabricks"
