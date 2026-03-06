@@ -40,10 +40,20 @@ get_chromosomes() {
         return 1
     fi
 
+    # NOTE: chrY is intentionally excluded from preprocessing.
+    # CombineGVCFs on chrY is pathologically slow with large cohorts due to:
+    #   1. Mixed ploidy (haploid in males, diploid in PAR1/PAR2)
+    #   2. Massive annotation conflicts when merging male variants with female
+    #      <NON_REF> blocks, generating thousands of WARN events per run
+    #   3. Runtime scales super-linearly with sample count (observed: 115+ min
+    #      for 50 samples vs ~4 min for autosomes of comparable size)
+    # chrY variants are not included in any downstream metric or report.
+    # Future work: handle chrY separately with non-PAR intervals only
+    # (-L chrY:2781480-56887902 for hg38) or with ploidy-aware genotyping.
     while IFS= read -r chr; do
         _chrs+=("${chr}")
     done < <(awk '{print $1}' "${REF_GENOME}.fai" \
-             | grep -E '^(chr[0-9]+|chrX|chrY|chrM|[0-9]+|X|Y|MT)$')
+             | grep -E '^(chr[0-9]+|chrX|chrM|[0-9]+|X|MT)$')
 
     if [[ "${#_chrs[@]}" -eq 0 ]]; then
         warn "PREPROC" "No standard chr names found in .fai — using all contigs"

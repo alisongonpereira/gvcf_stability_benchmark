@@ -1575,7 +1575,17 @@ def _collect_caveats(data: dict) -> list[str]:
     monitoring interval (5 s) is larger than the measured wall time, meaning
     peak GPU/CPU values were almost certainly not captured.
     """
-    caveats = []
+    caveats = [
+        "chrY was excluded from all preprocessing and genotyping steps. "
+        "CombineGVCFs on chrY exhibited pathologically long runtimes with large "
+        "cohorts (115+ min for N=50 vs ~4 min for autosomes of similar size), "
+        "caused by mixed ploidy (haploid/diploid in PAR regions) and thousands "
+        "of annotation-merge conflicts when combining male variants with female "
+        "&lt;NON_REF&gt; blocks. All variant counts, concordance, and timing "
+        "metrics in this report are computed on autosomes + chrX + chrM only. "
+        "chrY analysis requires a dedicated ploidy-aware approach and is out of "
+        "scope for this benchmark."
+    ]
     MONITOR_INTERVAL_S = 5   # matches config.sh MONITOR_INTERVAL default
     COARSE_THRESHOLD   = 3   # flag if wall_time < THRESHOLD × interval
 
