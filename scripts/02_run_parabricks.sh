@@ -152,19 +152,29 @@ run_size() {
     local geno_start; geno_start=$(date +%s)
 
     if [[ "${exit_code}" -eq 0 ]]; then
-        log "PARABRICKS" "[${label}] Step C: pbrun genotypegvcf..."
-        docker run --rm \
-            --gpus "\"device=${PARABRICKS_GPU_DEVICES}\"" \
-            -v /nfs:/nfs -v /home:/home \
-            -v /home/alisongonpereira/raid:/home/alisongonpereira/raid \
-            -w "${PWD}" \
-            "${PARABRICKS_DOCKER_IMAGE}" \
-            pbrun genotypegvcf \
-                --ref "${REF_GENOME}" \
-                --in-gvcf "${combined_gvcf}" \
-                --out-vcf "${output_vcf}" \
-            2>>"${stderr_log}" \
-        || { exit_code=$?; warn "PARABRICKS" "[${label}] pbrun genotypegvcf failed"; }
+        local geno_attempt geno_max_attempts=3 geno_backoff=30
+        for (( geno_attempt=1; geno_attempt<=geno_max_attempts; geno_attempt++ )); do
+            [[ "${geno_attempt}" -gt 1 ]] && \
+                log "PARABRICKS" "[${label}] Step C retry ${geno_attempt}/${geno_max_attempts} (backoff ${geno_backoff}s)..." && \
+                sleep "${geno_backoff}" && \
+                (( geno_backoff *= 2 ))
+            log "PARABRICKS" "[${label}] Step C: pbrun genotypegvcf (attempt ${geno_attempt}/${geno_max_attempts})..."
+            exit_code=0
+            docker run --rm \
+                --gpus "\"device=${PARABRICKS_GPU_DEVICES}\"" \
+                -v /nfs:/nfs -v /home:/home \
+                -v /home/alisongonpereira/raid:/home/alisongonpereira/raid \
+                -w "${PWD}" \
+                "${PARABRICKS_DOCKER_IMAGE}" \
+                pbrun genotypegvcf \
+                    --ref "${REF_GENOME}" \
+                    --in-gvcf "${combined_gvcf}" \
+                    --out-vcf "${output_vcf}" \
+                2>>"${stderr_log}" \
+            || exit_code=$?
+            [[ "${exit_code}" -eq 0 ]] && break
+            warn "PARABRICKS" "[${label}] pbrun genotypegvcf failed (attempt ${geno_attempt}/${geno_max_attempts}, exit_code=${exit_code})"
+        done
     fi
 
     local geno_end; geno_end=$(date +%s)
